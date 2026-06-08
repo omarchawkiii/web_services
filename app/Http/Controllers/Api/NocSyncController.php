@@ -278,8 +278,8 @@ class NocSyncController extends Controller
                     'date_start'     => $s['date_start'],
                     'date_end'       => $s['date_end']       ?? null,
                     'status'         => $s['status']         ?? 'unlinked',
-                    'cpls'           => $s['cpls']           ?? 0,
-                    'kdm'            => $s['kdm']            ?? 0,
+                    'cpls'           => is_numeric($s['cpls'] ?? null) ? (int) $s['cpls'] : 0,
+                    'kdm'            => is_numeric($s['kdm']  ?? null) ? (int) $s['kdm']  : 0,
                     'kdm_notes'      => $s['kdm_notes']      ?? null,
                     'list_cpl_notes' => $s['list_cpl_notes'] ?? null,
                     'uuid_spl'       => $s['uuid_spl']       ?? null,
@@ -395,7 +395,7 @@ class NocSyncController extends Controller
                 if (!empty($e['noc_screen_id'])) {
                     $screen = HubScreen::where('noc_instance_id', $noc->id)->where('noc_screen_id', $e['noc_screen_id'])->first();
                 }
-                HubServerAlarm::create(['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'screen_id' => $screen?->id, 'alarm_working_state' => $e['alarm_working_state'] ?? null, 'index_alarm' => isset($e['index_alarm']) ? (int) preg_replace('/\D/', '', $e['index_alarm']) : null, 'title' => $e['title'] ?? null, 'synced_at' => now()]);
+                HubServerAlarm::create(['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'screen_id' => $screen?->id, 'alarm_working_state' => $e['alarm_working_state'] ?? null, 'index_alarm' => $e['index_alarm'] ?? null, 'title' => $e['title'] ?? null, 'synced_at' => now()]);
                 $synced++;
             }
         }
