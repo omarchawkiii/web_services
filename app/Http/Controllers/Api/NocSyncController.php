@@ -395,7 +395,7 @@ class NocSyncController extends Controller
                 if (!empty($e['noc_screen_id'])) {
                     $screen = HubScreen::where('noc_instance_id', $noc->id)->where('noc_screen_id', $e['noc_screen_id'])->first();
                 }
-                HubServerAlarm::create(['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'screen_id' => $screen?->id, 'alarm_working_state' => $e['alarm_working_state'] ?? null, 'index_alarm' => $e['index_alarm'] ?? null, 'title' => $e['title'] ?? null, 'synced_at' => now()]);
+                HubServerAlarm::create(['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'screen_id' => $screen?->id, 'alarm_working_state' => $e['alarm_working_state'] ?? null, 'index_alarm' => isset($e['index_alarm']) ? (int) preg_replace('/\D/', '', $e['index_alarm']) : null, 'title' => $e['title'] ?? null, 'synced_at' => now()]);
                 $synced++;
             }
         }
