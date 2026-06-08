@@ -189,7 +189,7 @@ class SyncNocErrors implements ShouldQueue
                     'noc_instance_id'     => $this->noc->id,
                     'location_id'         => $location->id,
                     'alarm_working_state' => $item['Alarm_Working_State'] ?? null,
-                    'index_alarm'         => $item['Index_alarm'] ?? null,
+                    'index_alarm'         => isset($item['Index_alarm']) ? (int) preg_replace('/\D/', '', $item['Index_alarm']) : null,
                     'title'               => $item['title'] ?? null,
                     'synced_at'           => now(),
                 ]);
