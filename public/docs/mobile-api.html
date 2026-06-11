@@ -339,7 +339,7 @@
 <div class="sidebar-logo">
     <h1>Sentinel NOC Hub</h1>
     <p>Mobile API Documentation</p>
-    <span class="sidebar-version">v1.0</span>
+    <span class="sidebar-version">v1.1</span>
 </div>
 
 <div class="nav-group">
@@ -389,7 +389,9 @@
 
 <div class="nav-group">
     <div class="nav-group-title">NOC Sync API</div>
-    <a href="#noc-playback-details" class="nav-link"><span class="nav-method m-post">POST</span> Playback Details</a>
+    <a href="#noc-schedules-clear"   class="nav-link"><span class="nav-method m-post">POST</span> Schedules Clear</a>
+    <a href="#noc-schedules-sync"    class="nav-link"><span class="nav-method m-post">POST</span> Schedules Sync</a>
+    <a href="#noc-playback-details"  class="nav-link"><span class="nav-method m-post">POST</span> Playback Details</a>
 </div>
 
 <div class="nav-group">
@@ -627,7 +629,9 @@
     <span class="json-key">"id"</span>: <span class="json-num">1</span>,
     <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span>,
     <span class="json-key">"city"</span>: <span class="json-str">"Paris"</span>,
+    <span class="json-key">"state"</span>: <span class="json-str">"Île-de-France"</span>,
     <span class="json-key">"country"</span>: <span class="json-str">"France"</span>,
+    <span class="json-key">"address"</span>: <span class="json-str">"1 Rue du Cinéma, 75001 Paris"</span>,
     <span class="json-key">"noc_instance"</span>: {
         <span class="json-key">"id"</span>: <span class="json-num">2</span>,
         <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span>
@@ -797,7 +801,9 @@
     <span class="json-key">"id"</span>: <span class="json-num">1</span>,
     <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span>,
     <span class="json-key">"city"</span>: <span class="json-str">"Paris"</span>,
+    <span class="json-key">"state"</span>: <span class="json-str">"Île-de-France"</span>,
     <span class="json-key">"country"</span>: <span class="json-str">"France"</span>,
+    <span class="json-key">"address"</span>: <span class="json-str">"1 Rue du Cinéma, 75001 Paris"</span>,
     <span class="json-key">"company"</span>: <span class="json-str">"Grand Cinema Group"</span>,
     <span class="json-key">"tms_system"</span>: <span class="json-str">"GDC"</span>
 },
@@ -1113,6 +1119,8 @@
     <p class="section-subtitle">
     Cinema screening schedules. All schedule endpoints accept an optional <code>date</code> query parameter
     (<code>YYYY-MM-DD</code>) — defaults to today when omitted.
+    The day window runs from <strong>5:00 AM</strong> to <strong>4:59 AM</strong> the following day
+    (not midnight-to-midnight) to match cinema operational shifts.
     </p>
 
     <!-- SCHEDULES INDEX -->
@@ -1605,6 +1613,167 @@
 <hr />
 
 <!-- ══════════════════════════════════════════════ -->
+<!--  NOC SYNC API — SCHEDULES                     -->
+<!-- ══════════════════════════════════════════════ -->
+<section>
+  <div class="section-title">
+    <div class="icon" style="background:#431407">📡</div>
+    NOC Sync API — Schedules
+  </div>
+  <p class="section-subtitle">
+    Endpoints called by NOC instances to sync schedule data to the hub.
+    Authentication: <code>Authorization: Bearer {noc_instance.api_key}</code>.
+    Always call <strong>clear first</strong>, then send chunks via sync.
+  </p>
+
+  <!-- SCHEDULES CLEAR -->
+  <div class="endpoint" id="noc-schedules-clear">
+    <div class="endpoint-header">
+      <span class="badge badge-post">POST</span>
+      <span class="endpoint-path">/api/noc/schedules/clear</span>
+      <span class="auth-badge" style="background:var(--orange-dim);color:var(--orange)">NOC API Key</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc-text">
+        Deletes all schedules for this NOC instance within the given date range.
+        Must be called <strong>before</strong> sending sync chunks so that sessions deleted in the NOC
+        are also removed from the hub.
+      </p>
+
+      <div class="table-label">Request Body (JSON)</div>
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">date_from</td><td class="field-type">string (YYYY-MM-DD)</td><td><span class="tag tag-req">required</span></td><td>Start date of the range to clear</td></tr>
+          <tr><td class="field-name">date_to</td><td class="field-type">string (YYYY-MM-DD)</td><td><span class="tag tag-req">required</span></td><td>End date of the range to clear (inclusive)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-block">
+        <div class="code-block-header"><span>Request Example</span><span>POST /api/noc/schedules/clear</span></div>
+        <pre>{
+  <span class="json-key">"date_from"</span>: <span class="json-str">"2026-06-12"</span>,
+  <span class="json-key">"date_to"</span>:   <span class="json-str">"2026-06-13"</span>
+}</pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+  <span class="json-key">"message"</span>: <span class="json-str">"42 schedule(s) cleared."</span>
+}</pre>
+      </div>
+
+      <div class="notice notice-warn" style="margin-top:12px">
+        <span>⚠️</span>
+        <div>This permanently deletes schedule records for the specified range and NOC instance.
+        Always follow immediately with a <code>schedules/sync</code> call to re-populate.</div>
+      </div>
+
+      <div class="response-tabs" style="margin-top:12px">
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Invalid NOC API key</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHEDULES SYNC -->
+  <div class="endpoint" id="noc-schedules-sync">
+    <div class="endpoint-header">
+      <span class="badge badge-post">POST</span>
+      <span class="endpoint-path">/api/noc/schedules/sync</span>
+      <span class="auth-badge" style="background:var(--orange-dim);color:var(--orange)">NOC API Key</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc-text">
+        Inserts or updates schedule records for this NOC instance. Supports chunked requests
+        (max 200 records per call). Uses <code>updateOrCreate</code> keyed by
+        <code>(noc_instance_id, noc_schedule_id)</code>.
+      </p>
+
+      <div class="notice notice-info" style="margin-bottom:12px">
+        <span>ℹ️</span>
+        <div>The NOC pushes <strong>today + tomorrow</strong> schedules. Call <code>schedules/clear</code> first
+        then send chunks of 200. The day window used is <strong>5:00 AM → 4:59 AM</strong>.</div>
+      </div>
+
+      <div class="table-label">Request Body</div>
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">schedules</td><td class="field-type">array</td><td><span class="tag tag-req">required</span></td><td>Array of schedule objects (max 200)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="table-label">Schedule object fields</div>
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">noc_schedule_id</td><td class="field-type">string</td><td><span class="tag tag-req">required</span></td><td>Unique schedule ID from the NOC</td></tr>
+          <tr><td class="field-name">noc_location_id</td><td class="field-type">integer</td><td><span class="tag tag-req">required</span></td><td>NOC-side location ID</td></tr>
+          <tr><td class="field-name">location</td><td class="field-type">object</td><td><span class="tag tag-opt">optional</span></td><td><code>{name, city, state, country, address}</code></td></tr>
+          <tr><td class="field-name">noc_screen_id</td><td class="field-type">integer</td><td><span class="tag tag-opt">optional</span></td><td>NOC-side screen ID</td></tr>
+          <tr><td class="field-name">screen</td><td class="field-type">object</td><td><span class="tag tag-opt">optional</span></td><td><code>{screen_name, screen_number}</code></td></tr>
+          <tr><td class="field-name">display_title</td><td class="field-type">string|null</td><td><span class="tag tag-opt">optional</span></td><td>Movie / show title</td></tr>
+          <tr><td class="field-name">type</td><td class="field-type">string|null</td><td><span class="tag tag-opt">optional</span></td><td>Schedule type (Feature, Short, etc.)</td></tr>
+          <tr><td class="field-name">date_start</td><td class="field-type">datetime</td><td><span class="tag tag-req">required</span></td><td>Session start datetime</td></tr>
+          <tr><td class="field-name">date_end</td><td class="field-type">datetime|null</td><td><span class="tag tag-opt">optional</span></td><td>Session end datetime</td></tr>
+          <tr><td class="field-name">status</td><td class="field-type">string</td><td><span class="tag tag-opt">optional</span></td><td><code>linked</code> | <code>unlinked</code></td></tr>
+          <tr><td class="field-name">cpls</td><td class="field-type">integer</td><td><span class="tag tag-opt">optional</span></td><td><code>0</code> = missing, <code>1</code> = present</td></tr>
+          <tr><td class="field-name">kdm</td><td class="field-type">integer</td><td><span class="tag tag-opt">optional</span></td><td><code>0</code> = pending, <code>1</code> = ready, <code>2</code> = expired</td></tr>
+          <tr><td class="field-name">kdm_notes</td><td class="field-type">object|null</td><td><span class="tag tag-opt">optional</span></td><td>Parsed KDM metadata (status, expiry dates)</td></tr>
+          <tr><td class="field-name">list_cpl_notes</td><td class="field-type">string|null</td><td><span class="tag tag-opt">optional</span></td><td>CPL issue notes</td></tr>
+          <tr><td class="field-name">uuid_spl</td><td class="field-type">string|null</td><td><span class="tag tag-opt">optional</span></td><td>SPL UUID</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-block">
+        <div class="code-block-header"><span>Request Example</span><span>POST /api/noc/schedules/sync</span></div>
+        <pre>{
+  <span class="json-key">"schedules"</span>: [
+    {
+      <span class="json-key">"noc_schedule_id"</span>: <span class="json-str">"SCH_2026_06_12_S1_001"</span>,
+      <span class="json-key">"noc_location_id"</span>: <span class="json-num">1</span>,
+      <span class="json-key">"location"</span>: {
+        <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span>,
+        <span class="json-key">"city"</span>: <span class="json-str">"Paris"</span>,
+        <span class="json-key">"state"</span>: <span class="json-str">"Île-de-France"</span>,
+        <span class="json-key">"country"</span>: <span class="json-str">"France"</span>,
+        <span class="json-key">"address"</span>: <span class="json-str">"1 Rue du Cinéma, 75001 Paris"</span>
+      },
+      <span class="json-key">"noc_screen_id"</span>: <span class="json-num">3</span>,
+      <span class="json-key">"screen"</span>: { <span class="json-key">"screen_name"</span>: <span class="json-str">"Screen 3"</span>, <span class="json-key">"screen_number"</span>: <span class="json-num">3</span> },
+      <span class="json-key">"display_title"</span>: <span class="json-str">"Inception - Dolby Atmos"</span>,
+      <span class="json-key">"date_start"</span>: <span class="json-str">"2026-06-12T14:00:00"</span>,
+      <span class="json-key">"date_end"</span>: <span class="json-str">"2026-06-12T16:30:00"</span>,
+      <span class="json-key">"status"</span>: <span class="json-str">"linked"</span>,
+      <span class="json-key">"cpls"</span>: <span class="json-num">1</span>,
+      <span class="json-key">"kdm"</span>: <span class="json-num">1</span>
+    }
+  ]
+}</pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+  <span class="json-key">"message"</span>: <span class="json-str">"1 schedule(s) synced."</span>,
+  <span class="json-key">"synced"</span>: <span class="json-num">1</span>
+}</pre>
+      </div>
+
+      <div class="response-tabs" style="margin-top:12px">
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Invalid NOC API key</span>
+        <span class="resp-tab resp-422">422 — Validation error</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr />
+
+<!-- ══════════════════════════════════════════════ -->
 <!--  NOC SYNC API — PLAYBACK DETAILS              -->
 <!-- ══════════════════════════════════════════════ -->
 <section>
@@ -1656,7 +1825,7 @@
         <tbody>
           <tr><td class="field-name">noc_location_id</td><td class="field-type">integer</td><td><span class="tag tag-req">required</span></td><td>NOC-side location ID</td></tr>
           <tr><td class="field-name">noc_screen_id</td><td class="field-type">integer</td><td><span class="tag tag-req">required</span></td><td>NOC-side screen ID</td></tr>
-          <tr><td class="field-name">location</td><td class="field-type">object</td><td><span class="tag tag-opt">optional</span></td><td>Location metadata <code>{name, city, country, state, company, tms_system}</code></td></tr>
+          <tr><td class="field-name">location</td><td class="field-type">object</td><td><span class="tag tag-opt">optional</span></td><td>Location metadata <code>{name, city, state, country, address, company, tms_system}</code></td></tr>
           <tr><td class="field-name">screen</td><td class="field-type">object</td><td><span class="tag tag-opt">optional</span></td><td>Screen metadata <code>{screen_name, screen_number, screenModel}</code></td></tr>
         </tbody>
       </table>
@@ -1780,6 +1949,27 @@
     </div>
     <p class="section-subtitle">Key data structures and field reference used across API responses.</p>
 
+    <!-- Location model -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px">
+    <div style="font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text)">Location Object</div>
+    <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px">
+        Returned in <code>profile.locations</code>, <code>playback/{id}</code>, schedule responses, and error responses.
+    </p>
+    <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+        <tr><td class="field-name">id</td><td class="field-type">integer</td><td>Hub location ID</td></tr>
+        <tr><td class="field-name">name</td><td class="field-type">string</td><td>Cinema name</td></tr>
+        <tr><td class="field-name">city</td><td class="field-type">string|null</td><td>City</td></tr>
+        <tr><td class="field-name">state</td><td class="field-type">string|null</td><td>State / region</td></tr>
+        <tr><td class="field-name">country</td><td class="field-type">string|null</td><td>Country</td></tr>
+        <tr><td class="field-name">address</td><td class="field-type">string|null</td><td>Full street address</td></tr>
+        <tr><td class="field-name">company</td><td class="field-type">string|null</td><td>Cinema group / company name</td></tr>
+        <tr><td class="field-name">tms_system</td><td class="field-type">string|null</td><td>TMS system in use (e.g. GDC, Dolby)</td></tr>
+        </tbody>
+    </table>
+    </div>
+
     <!-- KDM values -->
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px">
     <div style="font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text)">KDM Status Values</div>
@@ -1862,7 +2052,7 @@ POST /api/hub/mobile/logout</pre>
 </section>
 
 <div style="margin-top:64px;padding-top:32px;border-top:1px solid var(--border);color:var(--text-dim);font-size:12px;text-align:center">
-    Sentinel NOC Hub — Mobile API Documentation &nbsp;·&nbsp; Generated 2026-06-08 &nbsp;·&nbsp; For internal use only
+    Sentinel NOC Hub — Mobile API Documentation &nbsp;·&nbsp; Generated 2026-06-11 &nbsp;·&nbsp; v1.1 &nbsp;·&nbsp; For internal use only
 </div>
 </main>
 

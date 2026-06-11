@@ -77,6 +77,57 @@
         clearTimeout(searchTimer);
         searchTimer = setTimeout(() => document.getElementById('filter-form').submit(), 400);
     });
+
+    // ── Location detail modal ──────────────────────────────────────────────────
+    const locModal    = document.getElementById('loc-modal');
+    const locBackdrop = document.getElementById('loc-backdrop');
+    const locClose    = document.getElementById('loc-close');
+
+    function openLocModal(btn) {
+        const name    = btn.dataset.name    || '';
+        const country = btn.dataset.country || '—';
+        const state   = btn.dataset.state   || '—';
+        const city    = btn.dataset.city    || '—';
+        const address = btn.dataset.address || '';
+        const company = btn.dataset.company || '—';
+        const tms     = btn.dataset.tms     || '—';
+        const noc     = btn.dataset.noc     || '';
+
+        document.getElementById('modal-initials').textContent = name.substring(0, 2).toUpperCase();
+        document.getElementById('modal-name').textContent     = name;
+        document.getElementById('modal-noc').textContent      = noc ? ('NOC: ' + noc) : '';
+
+        const addrEl = document.getElementById('modal-address');
+        addrEl.textContent   = address;
+        addrEl.style.display = address ? '' : 'none';
+
+        const cityStateEl = document.getElementById('modal-city-state');
+        const parts = [city !== '—' ? city : '', state !== '—' ? state : ''].filter(Boolean);
+        cityStateEl.textContent   = parts.join(', ');
+        cityStateEl.style.display = parts.length ? '' : 'none';
+
+        document.getElementById('modal-country').textContent  = country !== '—' ? country : '';
+        document.getElementById('modal-country2').textContent = country;
+        document.getElementById('modal-state').textContent    = state;
+        document.getElementById('modal-city').textContent     = city;
+        document.getElementById('modal-tms').textContent      = tms;
+        document.getElementById('modal-company').textContent  = company;
+
+        locModal.classList.remove('hidden');
+        locModal.classList.add('flex');
+    }
+
+    function closeLocModal() {
+        locModal.classList.add('hidden');
+        locModal.classList.remove('flex');
+    }
+
+    document.querySelectorAll('.loc-detail-btn').forEach(btn => {
+        btn.addEventListener('click', () => openLocModal(btn));
+    });
+    locClose.addEventListener('click', closeLocModal);
+    locBackdrop.addEventListener('click', closeLocModal);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLocModal(); });
 </script>
 @endpush
 
@@ -143,6 +194,7 @@
                     <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Company</th>
                     <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">TMS</th>
                     <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">NOC Source</th>
+                    <th class="px-5 py-3"></th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 bg-white">
@@ -183,11 +235,95 @@
                                 </span>
                             @endif
                         </td>
+                        <td class="px-5 py-3 text-right">
+                            <button type="button"
+                                class="loc-detail-btn inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                                data-name="{{ $location->name }}"
+                                data-country="{{ $location->country }}"
+                                data-state="{{ $location->state }}"
+                                data-city="{{ $location->city }}"
+                                data-address="{{ $location->address }}"
+                                data-company="{{ $location->company }}"
+                                data-tms="{{ $location->tms_system }}"
+                                data-noc="{{ $location->nocInstance?->name }}">
+                                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.641 0-8.573-3.007-9.964-7.178Z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                </svg>
+                                Details
+                            </button>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
     @endif
+</div>
+
+{{-- Location Detail Modal --}}
+<div id="loc-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div id="loc-backdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-md rounded-2xl bg-white shadow-xl">
+
+        {{-- Header --}}
+        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+            <div class="flex items-center gap-3">
+                <div id="modal-initials" class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-sm font-bold text-slate-600"></div>
+                <div>
+                    <h3 id="modal-name" class="text-base font-semibold text-gray-900"></h3>
+                    <p id="modal-noc" class="text-xs text-purple-600 font-medium mt-0.5"></p>
+                </div>
+            </div>
+            <button id="loc-close" class="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        {{-- Body --}}
+        <div class="px-6 py-5 space-y-4">
+
+            {{-- Address summary block --}}
+            <div class="rounded-xl bg-gray-50 border border-gray-100 px-4 py-3">
+                <div class="flex items-start gap-3">
+                    <svg class="h-4 w-4 text-gray-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
+                    </svg>
+                    <div class="flex-1 space-y-0.5">
+                        <p id="modal-address" class="text-sm text-gray-700"></p>
+                        <p id="modal-city-state" class="text-sm text-gray-700"></p>
+                        <p id="modal-country" class="text-sm font-semibold text-gray-900"></p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Detail grid --}}
+            <div class="grid grid-cols-2 gap-3">
+                <div class="rounded-lg bg-gray-50 border border-gray-100 px-3 py-2.5">
+                    <p class="text-xs text-gray-400 uppercase tracking-wide font-medium mb-0.5">Country</p>
+                    <p id="modal-country2" class="text-sm font-medium text-gray-800"></p>
+                </div>
+                <div class="rounded-lg bg-gray-50 border border-gray-100 px-3 py-2.5">
+                    <p class="text-xs text-gray-400 uppercase tracking-wide font-medium mb-0.5">State</p>
+                    <p id="modal-state" class="text-sm font-medium text-gray-800"></p>
+                </div>
+                <div class="rounded-lg bg-gray-50 border border-gray-100 px-3 py-2.5">
+                    <p class="text-xs text-gray-400 uppercase tracking-wide font-medium mb-0.5">City</p>
+                    <p id="modal-city" class="text-sm font-medium text-gray-800"></p>
+                </div>
+                <div class="rounded-lg bg-gray-50 border border-gray-100 px-3 py-2.5">
+                    <p class="text-xs text-gray-400 uppercase tracking-wide font-medium mb-0.5">TMS</p>
+                    <p id="modal-tms" class="text-sm font-medium text-gray-800"></p>
+                </div>
+                <div class="col-span-2 rounded-lg bg-gray-50 border border-gray-100 px-3 py-2.5">
+                    <p class="text-xs text-gray-400 uppercase tracking-wide font-medium mb-0.5">Company</p>
+                    <p id="modal-company" class="text-sm font-medium text-gray-800"></p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @endsection
