@@ -48,6 +48,7 @@ class NocSyncController extends Controller
                 'city'       => $locationData['city']       ?? null,
                 'country'    => $locationData['country']    ?? null,
                 'state'      => $locationData['state']      ?? null,
+                'address'    => $locationData['address']    ?? null,
                 'company'    => $locationData['company']    ?? null,
                 'tms_system' => $locationData['tms_system'] ?? null,
             ]
@@ -89,6 +90,7 @@ class NocSyncController extends Controller
             'locations.*.city'            => 'nullable|string|max:255',
             'locations.*.country'         => 'nullable|string|max:255',
             'locations.*.state'           => 'nullable|string|max:255',
+            'locations.*.address'         => 'nullable|string|max:500',
             'locations.*.company'         => 'nullable|string|max:255',
             'locations.*.tms_system'      => 'nullable|string|max:255',
         ]);
@@ -102,6 +104,7 @@ class NocSyncController extends Controller
                     'city'       => $loc['city']       ?? null,
                     'country'    => $loc['country']    ?? null,
                     'state'      => $loc['state']      ?? null,
+                    'address'    => $loc['address']    ?? null,
                     'company'    => $loc['company']    ?? null,
                     'tms_system' => $loc['tms_system'] ?? null,
                 ]

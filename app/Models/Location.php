@@ -18,6 +18,7 @@ class Location extends Model
         'city',
         'country',
         'state',
+        'address',
         'company',
         'tms_system',
     ];
