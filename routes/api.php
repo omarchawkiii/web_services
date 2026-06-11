@@ -20,6 +20,7 @@ Route::prefix('noc')->group(function () {
     Route::post('/users/sync',     [NocSyncController::class, 'syncUsers']);
     Route::post('/playback/sync',         [NocSyncController::class, 'syncPlayback']);
     Route::post('/playback-details/sync', [NocSyncController::class, 'syncPlaybackDetails']);
+    Route::post('/schedules/clear',       [NocSyncController::class, 'clearSchedules']);
     Route::post('/schedules/sync',        [NocSyncController::class, 'syncSchedules']);
     Route::post('/errors/sync',           [NocSyncController::class, 'syncErrors']);
 });

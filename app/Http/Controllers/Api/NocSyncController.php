@@ -252,6 +252,26 @@ class NocSyncController extends Controller
     // ── Schedules ─────────────────────────────────────────────────────────────
 
     /**
+     * POST /api/noc/schedules/clear
+     * Delete all schedules for this NOC in the given date range before a fresh sync.
+     */
+    public function clearSchedules(Request $request): JsonResponse
+    {
+        $noc = $this->authenticateNoc($request);
+        if (!$noc) return response()->json(['message' => 'Invalid API key.'], 401);
+
+        $dateFrom = $request->input('date_from'); // e.g. "2026-06-12"
+        $dateTo   = $request->input('date_to');   // e.g. "2026-06-13"
+
+        $deleted = HubSchedule::where('noc_instance_id', $noc->id)
+            ->where('date_start', '>=', $dateFrom . ' 00:00:00')
+            ->where('date_start', '<=', $dateTo   . ' 23:59:59')
+            ->delete();
+
+        return response()->json(['message' => "{$deleted} schedule(s) cleared."]);
+    }
+
+    /**
      * POST /api/noc/schedules/sync
      */
     public function syncSchedules(Request $request): JsonResponse
