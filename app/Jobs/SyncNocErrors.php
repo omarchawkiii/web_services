@@ -59,8 +59,8 @@ class SyncNocErrors implements ShouldQueue
 
         // ── KDM Errors ───────────────────────────────────────────────────────
         $kdmData = $client->get('/api/mobile/errors/kdm');
+        HubKdmError::where('noc_instance_id', $this->noc->id)->delete();
         if ($kdmData && !empty($kdmData['kdms_errors_list'])) {
-            HubKdmError::where('noc_instance_id', $this->noc->id)->delete();
             foreach ($kdmData['kdms_errors_list'] as $item) {
                 $location = $this->resolveLocation($item['location_id'] ?? null);
                 if (!$location) continue;
@@ -80,8 +80,8 @@ class SyncNocErrors implements ShouldQueue
 
         // ── Server Errors ────────────────────────────────────────────────────
         $serverData = $client->get('/api/mobile/errors/server');
+        HubServerError::where('noc_instance_id', $this->noc->id)->delete();
         if ($serverData && !empty($serverData['server_errors_list'])) {
-            HubServerError::where('noc_instance_id', $this->noc->id)->delete();
             foreach ($serverData['server_errors_list'] as $item) {
                 $location = $this->resolveLocation($item['location_id'] ?? null);
                 if (!$location) continue;
@@ -104,8 +104,8 @@ class SyncNocErrors implements ShouldQueue
 
         // ── Projector Errors ─────────────────────────────────────────────────
         $projData = $client->get('/api/mobile/errors/projector');
+        HubProjectorError::where('noc_instance_id', $this->noc->id)->delete();
         if ($projData && !empty($projData['projector_errors_list'])) {
-            HubProjectorError::where('noc_instance_id', $this->noc->id)->delete();
             foreach ($projData['projector_errors_list'] as $item) {
                 $location = $this->resolveLocation($item['location_id'] ?? null);
                 if (!$location) continue;
@@ -126,8 +126,8 @@ class SyncNocErrors implements ShouldQueue
 
         // ── Sound Errors ─────────────────────────────────────────────────────
         $soundData = $client->get('/api/mobile/errors/sound');
+        HubSoundError::where('noc_instance_id', $this->noc->id)->delete();
         if ($soundData && !empty($soundData['sounds_errors_list'])) {
-            HubSoundError::where('noc_instance_id', $this->noc->id)->delete();
             foreach ($soundData['sounds_errors_list'] as $item) {
                 $location = $this->resolveLocation($item['location_id'] ?? null);
                 if (!$location) continue;
@@ -149,8 +149,8 @@ class SyncNocErrors implements ShouldQueue
 
         // ── Storage Errors ───────────────────────────────────────────────────
         $storageData = $client->get('/api/mobile/errors/storage');
+        HubStorageError::where('noc_instance_id', $this->noc->id)->delete();
         if ($storageData && !empty($storageData['storage_errors_list'])) {
-            HubStorageError::where('noc_instance_id', $this->noc->id)->delete();
             foreach ($storageData['storage_errors_list'] as $item) {
                 $location = $this->resolveLocation($item['location_id'] ?? null);
                 if (!$location) continue;
@@ -180,8 +180,8 @@ class SyncNocErrors implements ShouldQueue
 
         // ── Server Alarms ────────────────────────────────────────────────────
         $alarmsData = $client->get('/api/mobile/errors/server-alarms');
+        HubServerAlarm::where('noc_instance_id', $this->noc->id)->delete();
         if ($alarmsData && !empty($alarmsData['alarms'])) {
-            HubServerAlarm::where('noc_instance_id', $this->noc->id)->delete();
             foreach ($alarmsData['alarms'] as $item) {
                 $location = $this->resolveLocation($item['location_id'] ?? null);
                 if (!$location) continue;

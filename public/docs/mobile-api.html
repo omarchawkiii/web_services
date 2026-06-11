@@ -336,33 +336,36 @@
 
 <!-- ──────────────────── SIDEBAR ──────────────────── -->
 <nav class="sidebar">
-  <div class="sidebar-logo">
+<div class="sidebar-logo">
     <h1>Sentinel NOC Hub</h1>
     <p>Mobile API Documentation</p>
     <span class="sidebar-version">v1.0</span>
-  </div>
+</div>
 
-  <div class="nav-group">
+<div class="nav-group">
     <div class="nav-group-title">Overview</div>
     <a href="#overview"       class="nav-link">Introduction</a>
     <a href="#authentication" class="nav-link">Authentication</a>
     <a href="#errors"         class="nav-link">Error Codes</a>
-  </div>
+</div>
 
-  <div class="nav-group">
+<div class="nav-group">
     <div class="nav-group-title">Auth Endpoints</div>
     <a href="#login"   class="nav-link"><span class="nav-method m-post">POST</span> Login</a>
     <a href="#profile" class="nav-link"><span class="nav-method m-get">GET</span> Profile</a>
     <a href="#logout"  class="nav-link"><span class="nav-method m-post">POST</span> Logout</a>
-  </div>
+</div>
 
-  <div class="nav-group">
+<div class="nav-group">
     <div class="nav-group-title">Playback</div>
-    <a href="#playback-index" class="nav-link"><span class="nav-method m-get">GET</span> List Playbacks</a>
-    <a href="#playback-show"  class="nav-link"><span class="nav-method m-get">GET</span> Get Playback</a>
-  </div>
+    <a href="#playback-index"     class="nav-link"><span class="nav-method m-get">GET</span> List Playbacks</a>
+    <a href="#playback-show"      class="nav-link"><span class="nav-method m-get">GET</span> Get Playback</a>
+    <a href="#playback-server"    class="nav-link"><span class="nav-method m-get">GET</span> Server Detail</a>
+    <a href="#playback-projector" class="nav-link"><span class="nav-method m-get">GET</span> Projector Detail</a>
+    <a href="#playback-sound"     class="nav-link"><span class="nav-method m-get">GET</span> Sound Detail</a>
+</div>
 
-  <div class="nav-group">
+<div class="nav-group">
     <div class="nav-group-title">Schedules</div>
     <a href="#schedules-index"       class="nav-link"><span class="nav-method m-get">GET</span> List Schedules</a>
     <a href="#schedules-unlinked"    class="nav-link"><span class="nav-method m-get">GET</span> Unlinked</a>
@@ -370,9 +373,9 @@
     <a href="#schedules-missing-kdms" class="nav-link"><span class="nav-method m-get">GET</span> Missing KDMs</a>
     <a href="#schedules-kdm-expired"  class="nav-link"><span class="nav-method m-get">GET</span> KDM Expired</a>
     <a href="#schedules-kdm-expiring" class="nav-link"><span class="nav-method m-get">GET</span> KDM Expiring</a>
-  </div>
+</div>
 
-  <div class="nav-group">
+<div class="nav-group">
     <div class="nav-group-title">Errors & Alerts</div>
     <a href="#errors-summary"  class="nav-link"><span class="nav-method m-get">GET</span> Summary</a>
     <a href="#errors-kdm"      class="nav-link"><span class="nav-method m-get">GET</span> KDM Errors</a>
@@ -382,312 +385,319 @@
     <a href="#errors-storage"  class="nav-link"><span class="nav-method m-get">GET</span> Storage Errors</a>
     <a href="#errors-raid"     class="nav-link"><span class="nav-method m-get">GET</span> RAID Alerts</a>
     <a href="#errors-alarms"   class="nav-link"><span class="nav-method m-get">GET</span> Server Alarms</a>
-  </div>
+</div>
 
-  <div class="nav-group">
+<div class="nav-group">
+    <div class="nav-group-title">NOC Sync API</div>
+    <a href="#noc-playback-details" class="nav-link"><span class="nav-method m-post">POST</span> Playback Details</a>
+</div>
+
+<div class="nav-group">
     <div class="nav-group-title">Data Models</div>
     <a href="#models" class="nav-link">Schema Reference</a>
-  </div>
+</div>
 </nav>
 
 <!-- ──────────────────── MAIN ──────────────────── -->
 <main>
 
-  <!-- HERO -->
-  <div class="hero" id="overview">
+<!-- HERO -->
+<div class="hero" id="overview">
     <h1>Sentinel NOC Hub <span>Mobile API</span></h1>
     <p>
-      Complete REST API reference for integrating the mobile application with the Sentinel NOC Hub.
-      All endpoints return JSON. Authentication is handled via Laravel Sanctum bearer tokens.
+    Complete REST API reference for integrating the mobile application with the Sentinel NOC Hub.
+    All endpoints return JSON. Authentication is handled via Laravel Sanctum bearer tokens.
     </p>
     <div class="hero-meta">
-      <div class="hero-meta-item">
+    <div class="hero-meta-item">
         <div class="label">Base URL</div>
         <div class="val">https://your-hub-domain.com</div>
-      </div>
-      <div class="hero-meta-item">
+    </div>
+    <div class="hero-meta-item">
         <div class="label">API Prefix</div>
         <div class="val">/api/hub/mobile</div>
-      </div>
-      <div class="hero-meta-item">
+    </div>
+    <div class="hero-meta-item">
         <div class="label">Format</div>
         <div class="val">JSON (application/json)</div>
-      </div>
-      <div class="hero-meta-item">
+    </div>
+    <div class="hero-meta-item">
         <div class="label">Auth</div>
         <div class="val">Bearer Token (Sanctum)</div>
-      </div>
     </div>
-  </div>
+    </div>
+</div>
 
-  <!-- ── AUTHENTICATION ── -->
-  <section id="authentication">
+<!-- ── AUTHENTICATION ── -->
+<section id="authentication">
     <div class="section-title">
-      <div class="icon" style="background:#1e3a6e">🔑</div>
-      Authentication
+    <div class="icon" style="background:#1e3a6e">🔑</div>
+    Authentication
     </div>
     <p class="section-subtitle">How to authenticate requests to the mobile API.</p>
 
     <p style="color:var(--text-muted);font-size:14px;margin-bottom:16px;">
-      The mobile API uses <strong style="color:var(--text)">Laravel Sanctum</strong> token-based authentication.
-      After logging in, you receive a plaintext bearer token that must be included in the
-      <code>Authorization</code> header for every protected request.
+    The mobile API uses <strong style="color:var(--text)">Laravel Sanctum</strong> token-based authentication.
+    After logging in, you receive a plaintext bearer token that must be included in the
+    <code>Authorization</code> header for every protected request.
     </p>
 
     <div class="table-label">Request Header (all protected endpoints)</div>
     <div class="code-block">
-      <div class="code-block-header"><span>HTTP Header</span></div>
-      <pre>Authorization: Bearer <span style="color:var(--yellow)">{your_token}</span>
-Content-Type: application/json
-Accept: application/json</pre>
+    <div class="code-block-header"><span>HTTP Header</span></div>
+    <pre>
+        Authorization: Bearer <span style="color:var(--yellow)">{your_token}</span>
+        Content-Type: application/json
+        Accept: application/json
+    </pre>
     </div>
 
     <div class="notice notice-info" style="margin-top:16px">
-      <span>ℹ️</span>
-      <div>
+    <span>ℹ️</span>
+    <div>
         Only the <strong>login</strong> endpoint is public. All other endpoints require a valid bearer token.
         Tokens are single-session — logging in again invalidates previous tokens.
-      </div>
+    </div>
     </div>
 
     <div class="notice notice-warn" style="margin-top:10px">
-      <span>⚠️</span>
-      <div>
+    <span>⚠️</span>
+    <div>
         Data returned by each endpoint is <strong>scoped to the authenticated user's assigned locations</strong>.
         A user will never see data from locations they are not associated with.
-      </div>
     </div>
-  </section>
+    </div>
+</section>
 
-  <!-- ── ERROR CODES ── -->
-  <section id="errors">
+<!-- ── ERROR CODES ── -->
+<section id="errors">
     <div class="section-title">
-      <div class="icon" style="background:#450a0a">⚡</div>
-      Error Codes
+    <div class="icon" style="background:#450a0a">⚡</div>
+    Error Codes
     </div>
     <p class="section-subtitle">Standard HTTP error responses returned by the API.</p>
 
     <table>
-      <thead>
+    <thead>
         <tr>
-          <th>Status</th>
-          <th>Meaning</th>
-          <th>Common Cause</th>
-          <th>Response Body</th>
+        <th>Status</th>
+        <th>Meaning</th>
+        <th>Common Cause</th>
+        <th>Response Body</th>
         </tr>
-      </thead>
-      <tbody>
+    </thead>
+    <tbody>
         <tr>
-          <td><span class="resp-200 resp-tab">200 OK</span></td>
-          <td>Success</td>
-          <td>Request processed correctly</td>
-          <td>Endpoint-specific JSON</td>
-        </tr>
-        <tr>
-          <td><span class="resp-401 resp-tab">401</span></td>
-          <td>Unauthorized</td>
-          <td>Missing or expired token</td>
-          <td><code>{"message": "Unauthenticated."}</code></td>
+        <td><span class="resp-200 resp-tab">200 OK</span></td>
+        <td>Success</td>
+        <td>Request processed correctly</td>
+        <td>Endpoint-specific JSON</td>
         </tr>
         <tr>
-          <td><span class="resp-403 resp-tab">403</span></td>
-          <td>Forbidden</td>
-          <td>Resource not in user's locations</td>
-          <td><code>{"message": "Forbidden."}</code></td>
+        <td><span class="resp-401 resp-tab">401</span></td>
+        <td>Unauthorized</td>
+        <td>Missing or expired token</td>
+        <td><code>{"message": "Unauthenticated."}</code></td>
         </tr>
         <tr>
-          <td><span class="resp-404 resp-tab">404</span></td>
-          <td>Not Found</td>
-          <td>Invalid ID in URL parameter</td>
-          <td><code>{"message": "Not found."}</code></td>
+        <td><span class="resp-403 resp-tab">403</span></td>
+        <td>Forbidden</td>
+        <td>Resource not in user's locations</td>
+        <td><code>{"message": "Forbidden."}</code></td>
         </tr>
         <tr>
-          <td><span class="resp-422 resp-tab">422</span></td>
-          <td>Validation Error</td>
-          <td>Missing or invalid request fields</td>
-          <td><code>{"message": "...", "errors": {...}}</code></td>
+        <td><span class="resp-404 resp-tab">404</span></td>
+        <td>Not Found</td>
+        <td>Invalid ID in URL parameter</td>
+        <td><code>{"message": "Not found."}</code></td>
         </tr>
         <tr>
-          <td><span class="resp-tab" style="background:var(--red-dim);color:var(--red)">500</span></td>
-          <td>Server Error</td>
-          <td>Internal server exception</td>
-          <td><code>{"message": "Server Error."}</code></td>
+        <td><span class="resp-422 resp-tab">422</span></td>
+        <td>Validation Error</td>
+        <td>Missing or invalid request fields</td>
+        <td><code>{"message": "...", "errors": {...}}</code></td>
         </tr>
-      </tbody>
+        <tr>
+        <td><span class="resp-tab" style="background:var(--red-dim);color:var(--red)">500</span></td>
+        <td>Server Error</td>
+        <td>Internal server exception</td>
+        <td><code>{"message": "Server Error."}</code></td>
+        </tr>
+    </tbody>
     </table>
-  </section>
+</section>
 
-  <hr />
+<hr />
 
-  <!-- ══════════════════════════════════════════════ -->
-  <!--  AUTH ENDPOINTS                                -->
-  <!-- ══════════════════════════════════════════════ -->
-  <section>
+<!-- ══════════════════════════════════════════════ -->
+<!--  AUTH ENDPOINTS                                -->
+<!-- ══════════════════════════════════════════════ -->
+<section>
     <div class="section-title">
-      <div class="icon" style="background:#1e3a6e">👤</div>
-      Authentication Endpoints
+    <div class="icon" style="background:#1e3a6e">👤</div>
+    Authentication Endpoints
     </div>
     <p class="section-subtitle">Login, profile retrieval, and logout.</p>
 
     <!-- LOGIN -->
     <div class="endpoint" id="login">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-post">POST</span>
         <span class="endpoint-path">/api/hub/mobile/login</span>
         <span class="auth-badge no-auth">No Auth</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">
-          Authenticates a user and returns a Sanctum bearer token. Any existing mobile sessions for this user are revoked.
+        Authenticates a user and returns a Sanctum bearer token. Any existing mobile sessions for this user are revoked.
         </p>
 
         <div class="table-label">Request Body (JSON)</div>
         <table>
-          <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
-          <tbody>
+        <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
             <tr><td class="field-name">email</td><td class="field-type">string (email)</td><td><span class="tag tag-req">required</span></td><td>User email address</td></tr>
             <tr><td class="field-name">password</td><td class="field-type">string</td><td><span class="tag tag-req">required</span></td><td>Account password</td></tr>
-          </tbody>
+        </tbody>
         </table>
 
         <div class="code-block">
-          <div class="code-block-header"><span>Request Example</span><span>POST /api/hub/mobile/login</span></div>
-          <pre>{
-  <span class="json-key">"email"</span>: <span class="json-str">"user@example.com"</span>,
-  <span class="json-key">"password"</span>: <span class="json-str">"your_password"</span>
+        <div class="code-block-header"><span>Request Example</span><span>POST /api/hub/mobile/login</span></div>
+        <pre>{
+<span class="json-key">"email"</span>: <span class="json-str">"user@example.com"</span>,
+<span class="json-key">"password"</span>: <span class="json-str">"your_password"</span>
 }</pre>
         </div>
 
         <div class="table-label">Response 200 OK</div>
         <div class="code-block">
-          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
-          <pre>{
-  <span class="json-key">"token"</span>: <span class="json-str">"1|abc123xyz..."</span>,       <span class="json-comment">// Store this — used for all future requests</span>
-  <span class="json-key">"token_type"</span>: <span class="json-str">"Bearer"</span>,
-  <span class="json-key">"user"</span>: {
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"token"</span>: <span class="json-str">"1|abc123xyz..."</span>,       <span class="json-comment">// Store this — used for all future requests</span>
+<span class="json-key">"token_type"</span>: <span class="json-str">"Bearer"</span>,
+<span class="json-key">"user"</span>: {
     <span class="json-key">"id"</span>: <span class="json-num">42</span>,
     <span class="json-key">"name"</span>: <span class="json-str">"John"</span>,
     <span class="json-key">"last_name"</span>: <span class="json-str">"Doe"</span>,
     <span class="json-key">"username"</span>: <span class="json-str">"jdoe"</span>,
     <span class="json-key">"email"</span>: <span class="json-str">"user@example.com"</span>,
     <span class="json-key">"role"</span>: <span class="json-str">"Admin"</span>          <span class="json-comment">// "Admin" | "Manager" | "Cinema Staff"</span>
-  }
+}
 }</pre>
         </div>
 
         <div class="response-tabs">
-          <span class="resp-tab resp-200">200 OK — Token returned</span>
-          <span class="resp-tab resp-422">422 — Invalid credentials or missing fields</span>
+        <span class="resp-tab resp-200">200 OK — Token returned</span>
+        <span class="resp-tab resp-422">422 — Invalid credentials or missing fields</span>
         </div>
 
         <div class="notice notice-info" style="margin-top:14px">
-          <span>ℹ️</span>
-          <div>Save the <strong>token</strong> securely (e.g. Keychain / Keystore). It must be sent as
-          <code>Authorization: Bearer {token}</code> on every subsequent request.</div>
+        <span>ℹ️</span>
+        <div>Save the <strong>token</strong> securely (e.g. Keychain / Keystore). It must be sent as
+        <code>Authorization: Bearer {token}</code> on every subsequent request.</div>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- PROFILE -->
     <div class="endpoint" id="profile">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/profile</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">
-          Returns the authenticated user's profile and the list of cinema locations they are assigned to.
+        Returns the authenticated user's profile and the list of cinema locations they are assigned to.
         </p>
 
         <div class="table-label">Response 200 OK</div>
         <div class="code-block">
-          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
-          <pre>{
-  <span class="json-key">"user"</span>: {
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"user"</span>: {
     <span class="json-key">"id"</span>: <span class="json-num">42</span>,
     <span class="json-key">"name"</span>: <span class="json-str">"John"</span>,
     <span class="json-key">"last_name"</span>: <span class="json-str">"Doe"</span>,
     <span class="json-key">"username"</span>: <span class="json-str">"jdoe"</span>,
     <span class="json-key">"email"</span>: <span class="json-str">"user@example.com"</span>,
     <span class="json-key">"role"</span>: <span class="json-str">"Manager"</span>
-  },
-  <span class="json-key">"locations"</span>: [
+},
+<span class="json-key">"locations"</span>: [
     {
-      <span class="json-key">"id"</span>: <span class="json-num">1</span>,
-      <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span>,
-      <span class="json-key">"city"</span>: <span class="json-str">"Paris"</span>,
-      <span class="json-key">"country"</span>: <span class="json-str">"France"</span>,
-      <span class="json-key">"noc_instance"</span>: {
+    <span class="json-key">"id"</span>: <span class="json-num">1</span>,
+    <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span>,
+    <span class="json-key">"city"</span>: <span class="json-str">"Paris"</span>,
+    <span class="json-key">"country"</span>: <span class="json-str">"France"</span>,
+    <span class="json-key">"noc_instance"</span>: {
         <span class="json-key">"id"</span>: <span class="json-num">2</span>,
         <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span>
-      }
     }
-  ]
+    }
+]
 }</pre>
         </div>
 
         <div class="response-tabs">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- LOGOUT -->
     <div class="endpoint" id="logout">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-post">POST</span>
         <span class="endpoint-path">/api/hub/mobile/logout</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">
-          Revokes the current session token. The token becomes immediately invalid.
+        Revokes the current session token. The token becomes immediately invalid.
         </p>
         <div class="table-label">Response 200 OK</div>
         <div class="code-block">
-          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
-          <pre>{
-  <span class="json-key">"message"</span>: <span class="json-str">"Logged out successfully."</span>
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"message"</span>: <span class="json-str">"Logged out successfully."</span>
 }</pre>
         </div>
         <div class="response-tabs">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
     </div>
-  </section>
+    </div>
+</section>
 
-  <hr />
+<hr />
 
-  <!-- ══════════════════════════════════════════════ -->
-  <!--  PLAYBACK                                      -->
-  <!-- ══════════════════════════════════════════════ -->
-  <section>
+<!-- ══════════════════════════════════════════════ -->
+<!--  PLAYBACK                                      -->
+<!-- ══════════════════════════════════════════════ -->
+<section>
     <div class="section-title">
-      <div class="icon" style="background:#14532d">▶</div>
-      Playback
+    <div class="icon" style="background:#14532d">▶</div>
+    Playback
     </div>
     <p class="section-subtitle">Real-time playback status for cinema screens.</p>
 
     <!-- PLAYBACK INDEX -->
     <div class="endpoint" id="playback-index">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/playback</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">
-          Returns all playback records for locations assigned to the authenticated user, sorted by location.
+        Returns all playback records for locations assigned to the authenticated user, sorted by location.
         </p>
 
         <div class="table-label">Response Fields</div>
         <table>
-          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
-          <tbody>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
             <tr><td class="field-name">id</td><td class="field-type">integer</td><td>Playback record ID</td></tr>
             <tr><td class="field-name">noc_instance_id</td><td class="field-type">integer</td><td>NOC instance identifier</td></tr>
             <tr><td class="field-name">location_id</td><td class="field-type">integer</td><td>Cinema location ID</td></tr>
@@ -718,49 +728,105 @@ Accept: application/json</pre>
             <tr><td class="field-name">screen_name</td><td class="field-type">string|null</td><td>Screen name (joined)</td></tr>
             <tr><td class="field-name">screen_model</td><td class="field-type">string|null</td><td>Screen model (joined)</td></tr>
             <tr><td class="field-name">synced_at</td><td class="field-type">datetime|null</td><td>Last sync timestamp (ISO 8601)</td></tr>
-          </tbody>
+        </tbody>
         </table>
 
         <div class="code-block">
-          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
-          <pre>{
-  <span class="json-key">"playbacks"</span>: [
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"playbacks"</span>: [
     {
-      <span class="json-key">"id"</span>: <span class="json-num">1</span>,
-      <span class="json-key">"location_id"</span>: <span class="json-num">1</span>,
-      <span class="json-key">"screen_id"</span>: <span class="json-num">3</span>,
-      <span class="json-key">"playback_status"</span>: <span class="json-str">"Play"</span>,
-      <span class="json-key">"spl_title"</span>: <span class="json-str">"INCEPTION_DOLBY_20260601"</span>,
-      <span class="json-key">"cpl_title"</span>: <span class="json-str">"Inception - Feature - 2D - EN"</span>,
-      <span class="json-key">"elapsed_runtime"</span>: <span class="json-str">"00:45:12"</span>,
-      <span class="json-key">"remaining_runtime"</span>: <span class="json-str">"01:43:00"</span>,
-      <span class="json-key">"progress_bar"</span>: <span class="json-num">29.5</span>,
-      <span class="json-key">"noc_name"</span>: <span class="json-str">"NOC France"</span>,
-      <span class="json-key">"location_name"</span>: <span class="json-str">"Grand Cinema Paris"</span>,
-      <span class="json-key">"screen_name"</span>: <span class="json-str">"Screen 3"</span>,
-      <span class="json-key">"synced_at"</span>: <span class="json-str">"2026-06-08T14:30:00.000000Z"</span>
+    <span class="json-key">"id"</span>: <span class="json-num">1</span>,
+    <span class="json-key">"location_id"</span>: <span class="json-num">1</span>,
+    <span class="json-key">"screen_id"</span>: <span class="json-num">3</span>,
+    <span class="json-key">"playback_status"</span>: <span class="json-str">"Play"</span>,
+    <span class="json-key">"spl_title"</span>: <span class="json-str">"INCEPTION_DOLBY_20260601"</span>,
+    <span class="json-key">"cpl_title"</span>: <span class="json-str">"Inception - Feature - 2D - EN"</span>,
+    <span class="json-key">"elapsed_runtime"</span>: <span class="json-str">"00:45:12"</span>,
+    <span class="json-key">"remaining_runtime"</span>: <span class="json-str">"01:43:00"</span>,
+    <span class="json-key">"progress_bar"</span>: <span class="json-num">29.5</span>,
+    <span class="json-key">"noc_name"</span>: <span class="json-str">"NOC France"</span>,
+    <span class="json-key">"location_name"</span>: <span class="json-str">"Grand Cinema Paris"</span>,
+    <span class="json-key">"screen_name"</span>: <span class="json-str">"Screen 3"</span>,
+    <span class="json-key">"synced_at"</span>: <span class="json-str">"2026-06-08T14:30:00.000000Z"</span>
     }
-  ]
+]
 }</pre>
         </div>
 
         <div class="response-tabs">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- PLAYBACK SHOW -->
     <div class="endpoint" id="playback-show">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/playback/<span class="param">{id}</span></span>
+        <span class="auth-badge">Auth Required</span>
+    </div>
+    <div class="endpoint-body">
+        <p class="endpoint-desc-text">
+        Returns detailed playback data for a single screen, including full screen and location information.
+        </p>
+
+        <div class="table-label">URL Parameters</div>
+        <table>
+        <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+            <tr><td class="field-name">id</td><td class="field-type">integer</td><td>Playback record ID</td></tr>
+        </tbody>
+        </table>
+
+        <div class="code-block">
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"playback"</span>: { <span class="json-comment">/* all playback fields */</span> },
+<span class="json-key">"screen_info"</span>: {
+    <span class="json-key">"id"</span>: <span class="json-num">3</span>,
+    <span class="json-key">"noc_screen_id"</span>: <span class="json-num">7</span>,
+    <span class="json-key">"screen_name"</span>: <span class="json-str">"Screen 3"</span>,
+    <span class="json-key">"screen_number"</span>: <span class="json-num">3</span>,
+    <span class="json-key">"screen_model"</span>: <span class="json-str">"Barco DP4K-32B"</span>,
+    <span class="json-key">"synced_at"</span>: <span class="json-str">"2026-06-08T14:30:00.000000Z"</span>
+},
+<span class="json-key">"location_info"</span>: {
+    <span class="json-key">"id"</span>: <span class="json-num">1</span>,
+    <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span>,
+    <span class="json-key">"city"</span>: <span class="json-str">"Paris"</span>,
+    <span class="json-key">"country"</span>: <span class="json-str">"France"</span>,
+    <span class="json-key">"company"</span>: <span class="json-str">"Grand Cinema Group"</span>,
+    <span class="json-key">"tms_system"</span>: <span class="json-str">"GDC"</span>
+},
+<span class="json-key">"noc"</span>: {
+    <span class="json-key">"id"</span>: <span class="json-num">2</span>,
+    <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span>
+}
+}</pre>
+        </div>
+
+        <div class="response-tabs">
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-403">403 — Not your location</span>
+        <span class="resp-tab resp-404">404 — Not found</span>
+        </div>
+    </div>
+    </div>
+
+    <!-- PLAYBACK SERVER DETAIL -->
+    <div class="endpoint" id="playback-server">
+      <div class="endpoint-header">
+        <span class="badge badge-get">GET</span>
+        <span class="endpoint-path">/api/hub/mobile/playback/<span class="param">{id}</span>/server</span>
         <span class="auth-badge">Auth Required</span>
       </div>
       <div class="endpoint-body">
         <p class="endpoint-desc-text">
-          Returns detailed playback data for a single screen, including full screen and location information.
+          Returns server hardware details, storage devices list, and SMART disk health data for the screen linked to the given playback.
         </p>
 
         <div class="table-label">URL Parameters</div>
@@ -771,30 +837,85 @@ Accept: application/json</pre>
           </tbody>
         </table>
 
+        <div class="table-label">server_detail fields</div>
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">screen_number</td><td class="field-type">integer|null</td><td>Screen number</td></tr>
+            <tr><td class="field-name">show_title</td><td class="field-type">string|null</td><td>Current show title on server</td></tr>
+            <tr><td class="field-name">serial_number</td><td class="field-type">string|null</td><td>Server serial number</td></tr>
+            <tr><td class="field-name">main_software_version</td><td class="field-type">string|null</td><td>Main software version</td></tr>
+            <tr><td class="field-name">main_firmware_version</td><td class="field-type">string|null</td><td>Main firmware version</td></tr>
+            <tr><td class="field-name">bundle_version</td><td class="field-type">string|null</td><td>Bundle version</td></tr>
+            <tr><td class="field-name">certificat_date</td><td class="field-type">string|null</td><td>Certificate expiry date</td></tr>
+            <tr><td class="field-name">synced_at</td><td class="field-type">datetime|null</td><td>Last sync (ISO 8601)</td></tr>
+          </tbody>
+        </table>
+
+        <div class="table-label">storage_devices fields (array)</div>
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">index_storage</td><td class="field-type">integer|null</td><td>Storage device index</td></tr>
+            <tr><td class="field-name">bus</td><td class="field-type">string|null</td><td>Bus type (SATA, SAS, NVMe…)</td></tr>
+            <tr><td class="field-name">capacity</td><td class="field-type">string|null</td><td>Disk capacity</td></tr>
+            <tr><td class="field-name">model</td><td class="field-type">string|null</td><td>Disk model</td></tr>
+            <tr><td class="field-name">serial_number</td><td class="field-type">string|null</td><td>Disk serial number</td></tr>
+            <tr><td class="field-name">working_state</td><td class="field-type">string|null</td><td>Disk health state</td></tr>
+            <tr><td class="field-name">title</td><td class="field-type">string|null</td><td>Disk label / title</td></tr>
+            <tr><td class="field-name">type</td><td class="field-type">string|null</td><td>Disk type (SSD, HDD…)</td></tr>
+            <tr><td class="field-name">version</td><td class="field-type">string|null</td><td>Storage device firmware version</td></tr>
+          </tbody>
+        </table>
+
+        <div class="table-label">server_smarts fields (array)</div>
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">overall_health</td><td class="field-type">string|null</td><td>SMART overall health status</td></tr>
+            <tr><td class="field-name">power_on_hours</td><td class="field-type">string|null</td><td>Total power-on hours</td></tr>
+            <tr><td class="field-name">temperature</td><td class="field-type">string|null</td><td>Drive temperature (°C)</td></tr>
+            <tr><td class="field-name">raw_read_error</td><td class="field-type">string|null</td><td>Raw read error rate</td></tr>
+            <tr><td class="field-name">reallocated_sector_count</td><td class="field-type">string|null</td><td>Reallocated sector count</td></tr>
+            <tr><td class="field-name">reallocated_event</td><td class="field-type">string|null</td><td>Reallocated event count</td></tr>
+            <tr><td class="field-name">seek_error_rate</td><td class="field-type">string|null</td><td>Seek error rate</td></tr>
+            <tr><td class="field-name">udma_error</td><td class="field-type">string|null</td><td>UDMA CRC error count</td></tr>
+            <tr><td class="field-name">smart_support</td><td class="field-type">string|null</td><td>SMART support status</td></tr>
+            <tr><td class="field-name">scan_date</td><td class="field-type">string|null</td><td>Last SMART scan date</td></tr>
+          </tbody>
+        </table>
+
         <div class="code-block">
           <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
           <pre>{
-  <span class="json-key">"playback"</span>: { <span class="json-comment">/* all playback fields */</span> },
-  <span class="json-key">"screen_info"</span>: {
-    <span class="json-key">"id"</span>: <span class="json-num">3</span>,
-    <span class="json-key">"noc_screen_id"</span>: <span class="json-num">7</span>,
-    <span class="json-key">"screen_name"</span>: <span class="json-str">"Screen 3"</span>,
-    <span class="json-key">"screen_number"</span>: <span class="json-num">3</span>,
-    <span class="json-key">"screen_model"</span>: <span class="json-str">"Barco DP4K-32B"</span>,
+  <span class="json-key">"playback"</span>: { <span class="json-comment">/* playback fields */</span> },
+  <span class="json-key">"server_detail"</span>: {
+    <span class="json-key">"serial_number"</span>: <span class="json-str">"GDC-SX3000-00123"</span>,
+    <span class="json-key">"main_software_version"</span>: <span class="json-str">"10.4.2"</span>,
+    <span class="json-key">"main_firmware_version"</span>: <span class="json-str">"3.1.0"</span>,
+    <span class="json-key">"bundle_version"</span>: <span class="json-str">"2026.01"</span>,
+    <span class="json-key">"certificat_date"</span>: <span class="json-str">"2027-01-01"</span>,
     <span class="json-key">"synced_at"</span>: <span class="json-str">"2026-06-08T14:30:00.000000Z"</span>
   },
-  <span class="json-key">"location_info"</span>: {
-    <span class="json-key">"id"</span>: <span class="json-num">1</span>,
-    <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span>,
-    <span class="json-key">"city"</span>: <span class="json-str">"Paris"</span>,
-    <span class="json-key">"country"</span>: <span class="json-str">"France"</span>,
-    <span class="json-key">"company"</span>: <span class="json-str">"Grand Cinema Group"</span>,
-    <span class="json-key">"tms_system"</span>: <span class="json-str">"GDC"</span>
-  },
-  <span class="json-key">"noc"</span>: {
-    <span class="json-key">"id"</span>: <span class="json-num">2</span>,
-    <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span>
-  }
+  <span class="json-key">"storage_devices"</span>: [
+    {
+      <span class="json-key">"index_storage"</span>: <span class="json-num">0</span>,
+      <span class="json-key">"bus"</span>: <span class="json-str">"SATA"</span>,
+      <span class="json-key">"capacity"</span>: <span class="json-str">"4TB"</span>,
+      <span class="json-key">"model"</span>: <span class="json-str">"WDC WD4000FYYZ"</span>,
+      <span class="json-key">"working_state"</span>: <span class="json-str">"Online"</span>,
+      <span class="json-key">"type"</span>: <span class="json-str">"HDD"</span>
+    }
+  ],
+  <span class="json-key">"server_smarts"</span>: [
+    {
+      <span class="json-key">"overall_health"</span>: <span class="json-str">"PASSED"</span>,
+      <span class="json-key">"temperature"</span>: <span class="json-str">"36"</span>,
+      <span class="json-key">"power_on_hours"</span>: <span class="json-str">"12450"</span>,
+      <span class="json-key">"reallocated_sector_count"</span>: <span class="json-str">"0"</span>,
+      <span class="json-key">"scan_date"</span>: <span class="json-str">"2026-06-08"</span>
+    }
+  ]
 }</pre>
         </div>
 
@@ -806,45 +927,216 @@ Accept: application/json</pre>
         </div>
       </div>
     </div>
-  </section>
 
-  <hr />
+    <!-- PLAYBACK PROJECTOR DETAIL -->
+    <div class="endpoint" id="playback-projector">
+      <div class="endpoint-header">
+        <span class="badge badge-get">GET</span>
+        <span class="endpoint-path">/api/hub/mobile/playback/<span class="param">{id}</span>/projector</span>
+        <span class="auth-badge">Auth Required</span>
+      </div>
+      <div class="endpoint-body">
+        <p class="endpoint-desc-text">
+          Returns projector hardware specifications and the full lamp replacement history for the screen linked to the given playback.
+        </p>
 
-  <!-- ══════════════════════════════════════════════ -->
-  <!--  SCHEDULES                                     -->
-  <!-- ══════════════════════════════════════════════ -->
-  <section>
+        <div class="table-label">URL Parameters</div>
+        <table>
+          <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">id</td><td class="field-type">integer</td><td>Playback record ID</td></tr>
+          </tbody>
+        </table>
+
+        <div class="table-label">projector_detail fields</div>
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">system_model</td><td class="field-type">string|null</td><td>Projector model (e.g. Barco DP4K-32B)</td></tr>
+            <tr><td class="field-name">system_serial_number</td><td class="field-type">string|null</td><td>Projector serial number</td></tr>
+            <tr><td class="field-name">system_manufacture_date</td><td class="field-type">string|null</td><td>Manufacturing date</td></tr>
+            <tr><td class="field-name">system_software_version</td><td class="field-type">string|null</td><td>Projector firmware/software version</td></tr>
+            <tr><td class="field-name">operating_hours</td><td class="field-type">string|null</td><td>Total system operating hours</td></tr>
+            <tr><td class="field-name">power_status</td><td class="field-type">string|null</td><td>Power state (ON/OFF/Standby)</td></tr>
+            <tr><td class="field-name">shutter_status</td><td class="field-type">string|null</td><td>Shutter state (Open/Closed)</td></tr>
+            <tr><td class="field-name">light_status</td><td class="field-type">string|null</td><td>Light source status</td></tr>
+            <tr><td class="field-name">light_model</td><td class="field-type">string|null</td><td>Current lamp/light model</td></tr>
+            <tr><td class="field-name">light_serial</td><td class="field-type">string|null</td><td>Current lamp serial number</td></tr>
+            <tr><td class="field-name">light_hours</td><td class="field-type">string|null</td><td>Current lamp hours used</td></tr>
+            <tr><td class="field-name">synced_at</td><td class="field-type">datetime|null</td><td>Last sync (ISO 8601)</td></tr>
+          </tbody>
+        </table>
+
+        <div class="table-label">light_histories fields (array — sorted by index_lamp ASC)</div>
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">index_lamp</td><td class="field-type">integer|null</td><td>Lamp slot / history index</td></tr>
+            <tr><td class="field-name">serial_number</td><td class="field-type">string|null</td><td>Lamp serial number</td></tr>
+            <tr><td class="field-name">type</td><td class="field-type">string|null</td><td>Lamp type</td></tr>
+            <tr><td class="field-name">hours</td><td class="field-type">string|null</td><td>Hours used for this lamp</td></tr>
+            <tr><td class="field-name">power_range</td><td class="field-type">string|null</td><td>Power range used</td></tr>
+            <tr><td class="field-name">rotation_state</td><td class="field-type">string|null</td><td>Rotation state</td></tr>
+            <tr><td class="field-name">date_lamp</td><td class="field-type">string|null</td><td>Date lamp was installed/recorded</td></tr>
+          </tbody>
+        </table>
+
+        <div class="code-block">
+          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+          <pre>{
+  <span class="json-key">"playback"</span>: { <span class="json-comment">/* playback fields */</span> },
+  <span class="json-key">"projector_detail"</span>: {
+    <span class="json-key">"system_model"</span>: <span class="json-str">"Barco DP4K-32B"</span>,
+    <span class="json-key">"system_serial_number"</span>: <span class="json-str">"1234567890"</span>,
+    <span class="json-key">"system_software_version"</span>: <span class="json-str">"4.8.0"</span>,
+    <span class="json-key">"operating_hours"</span>: <span class="json-str">"18742"</span>,
+    <span class="json-key">"power_status"</span>: <span class="json-str">"ON"</span>,
+    <span class="json-key">"shutter_status"</span>: <span class="json-str">"Open"</span>,
+    <span class="json-key">"light_status"</span>: <span class="json-str">"On"</span>,
+    <span class="json-key">"light_model"</span>: <span class="json-str">"OSRAM XBO 4000W/DHP OFR"</span>,
+    <span class="json-key">"light_serial"</span>: <span class="json-str">"LMP-2024-001"</span>,
+    <span class="json-key">"light_hours"</span>: <span class="json-str">"342"</span>,
+    <span class="json-key">"synced_at"</span>: <span class="json-str">"2026-06-08T14:30:00.000000Z"</span>
+  },
+  <span class="json-key">"light_histories"</span>: [
+    {
+      <span class="json-key">"index_lamp"</span>: <span class="json-num">1</span>,
+      <span class="json-key">"serial_number"</span>: <span class="json-str">"LMP-2022-001"</span>,
+      <span class="json-key">"type"</span>: <span class="json-str">"Xenon"</span>,
+      <span class="json-key">"hours"</span>: <span class="json-str">"1980"</span>,
+      <span class="json-key">"power_range"</span>: <span class="json-str">"3500W"</span>,
+      <span class="json-key">"date_lamp"</span>: <span class="json-str">"2022-03-15"</span>
+    },
+    {
+      <span class="json-key">"index_lamp"</span>: <span class="json-num">2</span>,
+      <span class="json-key">"serial_number"</span>: <span class="json-str">"LMP-2024-001"</span>,
+      <span class="json-key">"hours"</span>: <span class="json-str">"342"</span>,
+      <span class="json-key">"date_lamp"</span>: <span class="json-str">"2024-11-02"</span>
+    }
+  ]
+}</pre>
+        </div>
+
+        <div class="response-tabs">
+          <span class="resp-tab resp-200">200 OK</span>
+          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+          <span class="resp-tab resp-403">403 — Not your location</span>
+          <span class="resp-tab resp-404">404 — Not found</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAYBACK SOUND DETAIL -->
+    <div class="endpoint" id="playback-sound">
+      <div class="endpoint-header">
+        <span class="badge badge-get">GET</span>
+        <span class="endpoint-path">/api/hub/mobile/playback/<span class="param">{id}</span>/sound</span>
+        <span class="auth-badge">Auth Required</span>
+      </div>
+      <div class="endpoint-body">
+        <p class="endpoint-desc-text">
+          Returns audio processor details and health status for the screen linked to the given playback.
+        </p>
+
+        <div class="table-label">URL Parameters</div>
+        <table>
+          <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">id</td><td class="field-type">integer</td><td>Playback record ID</td></tr>
+          </tbody>
+        </table>
+
+        <div class="table-label">sound_detail fields</div>
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">model</td><td class="field-type">string|null</td><td>Sound processor model (e.g. QSC Q-SYS)</td></tr>
+            <tr><td class="field-name">serial_number</td><td class="field-type">string|null</td><td>Processor serial number</td></tr>
+            <tr><td class="field-name">cat1700_serial_number</td><td class="field-type">string|null</td><td>CAT 1700 card serial number</td></tr>
+            <tr><td class="field-name">software</td><td class="field-type">string|null</td><td>Sound processor software version</td></tr>
+            <tr><td class="field-name">bypass</td><td class="field-type">string|null</td><td>Bypass state</td></tr>
+            <tr><td class="field-name">power_supply</td><td class="field-type">string|null</td><td>Power supply status</td></tr>
+            <tr><td class="field-name">aes_status</td><td class="field-type">string|null</td><td>AES audio signal status</td></tr>
+            <tr><td class="field-name">alert</td><td class="field-type">string|null</td><td>Active alert / alarm message</td></tr>
+            <tr><td class="field-name">screen_number</td><td class="field-type">integer|null</td><td>Screen number</td></tr>
+            <tr><td class="field-name">synced_at</td><td class="field-type">datetime|null</td><td>Last sync (ISO 8601)</td></tr>
+          </tbody>
+        </table>
+
+        <div class="code-block">
+          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+          <pre>{
+  <span class="json-key">"playback"</span>: { <span class="json-comment">/* playback fields */</span> },
+  <span class="json-key">"sound_detail"</span>: {
+    <span class="json-key">"model"</span>: <span class="json-str">"Dolby CP850"</span>,
+    <span class="json-key">"serial_number"</span>: <span class="json-str">"CP850-00987"</span>,
+    <span class="json-key">"cat1700_serial_number"</span>: <span class="json-null">null</span>,
+    <span class="json-key">"software"</span>: <span class="json-str">"7.5.1"</span>,
+    <span class="json-key">"bypass"</span>: <span class="json-str">"Off"</span>,
+    <span class="json-key">"power_supply"</span>: <span class="json-str">"OK"</span>,
+    <span class="json-key">"aes_status"</span>: <span class="json-str">"Locked"</span>,
+    <span class="json-key">"alert"</span>: <span class="json-null">null</span>,
+    <span class="json-key">"screen_number"</span>: <span class="json-num">3</span>,
+    <span class="json-key">"synced_at"</span>: <span class="json-str">"2026-06-08T14:30:00.000000Z"</span>
+  }
+}</pre>
+        </div>
+
+        <div class="notice notice-info" style="margin-top:12px">
+          <span>ℹ️</span>
+          <div>
+            <code>sound_detail</code> can be <code>null</code> if no sound data has been synced yet for this screen.
+            Always check for null before rendering.
+          </div>
+        </div>
+
+        <div class="response-tabs" style="margin-top:12px">
+          <span class="resp-tab resp-200">200 OK</span>
+          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+          <span class="resp-tab resp-403">403 — Not your location</span>
+          <span class="resp-tab resp-404">404 — Not found</span>
+        </div>
+      </div>
+    </div>
+</section>
+
+<hr />
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  SCHEDULES                                     -->
+<!-- ══════════════════════════════════════════════ -->
+<section>
     <div class="section-title">
-      <div class="icon" style="background:#3b0764">📅</div>
-      Schedules
+    <div class="icon" style="background:#3b0764">📅</div>
+    Schedules
     </div>
     <p class="section-subtitle">
-      Cinema screening schedules. All schedule endpoints accept an optional <code>date</code> query parameter
-      (<code>YYYY-MM-DD</code>) — defaults to today when omitted.
+    Cinema screening schedules. All schedule endpoints accept an optional <code>date</code> query parameter
+    (<code>YYYY-MM-DD</code>) — defaults to today when omitted.
     </p>
 
     <!-- SCHEDULES INDEX -->
     <div class="endpoint" id="schedules-index">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/schedules</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">Returns all schedules for the given date, scoped to the user's locations.</p>
 
         <div class="table-label">Query Parameters</div>
         <table>
-          <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
-          <tbody>
+        <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
             <tr><td class="field-name">date</td><td class="field-type">string (YYYY-MM-DD)</td><td><span class="tag tag-opt">optional</span></td><td>today</td><td>Filter schedules by date</td></tr>
-          </tbody>
+        </tbody>
         </table>
 
         <div class="table-label">Response Fields (per schedule)</div>
         <table>
-          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
-          <tbody>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
             <tr><td class="field-name">id</td><td class="field-type">integer</td><td>Schedule ID</td></tr>
             <tr><td class="field-name">noc_schedule_id</td><td class="field-type">string</td><td>Original ID from NOC system</td></tr>
             <tr><td class="field-name">display_title</td><td class="field-type">string|null</td><td>Movie / show title</td></tr>
@@ -859,523 +1151,689 @@ Accept: application/json</pre>
             <tr><td class="field-name">noc_instance</td><td class="field-type">object</td><td>NOC instance info <code>{id, name}</code></td></tr>
             <tr><td class="field-name">location</td><td class="field-type">object</td><td>Cinema location info</td></tr>
             <tr><td class="field-name">screen</td><td class="field-type">object|null</td><td>Screen info (null if no screen assigned)</td></tr>
-          </tbody>
+        </tbody>
         </table>
 
         <div class="code-block">
-          <div class="code-block-header"><span>Request Example</span></div>
-          <pre>GET /api/hub/mobile/schedules?date=2026-06-08</pre>
+        <div class="code-block-header"><span>Request Example</span></div>
+        <pre>GET /api/hub/mobile/schedules?date=2026-06-08</pre>
         </div>
 
         <div class="code-block">
-          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
-          <pre>{
-  <span class="json-key">"schedules"</span>: [
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"schedules"</span>: [
     {
-      <span class="json-key">"id"</span>: <span class="json-num">101</span>,
-      <span class="json-key">"noc_schedule_id"</span>: <span class="json-str">"SCH_2026_06_08_S3_001"</span>,
-      <span class="json-key">"display_title"</span>: <span class="json-str">"Inception - Dolby Atmos"</span>,
-      <span class="json-key">"type"</span>: <span class="json-str">"Feature"</span>,
-      <span class="json-key">"date_start"</span>: <span class="json-str">"2026-06-08T14:00:00.000000Z"</span>,
-      <span class="json-key">"date_end"</span>: <span class="json-str">"2026-06-08T16:30:00.000000Z"</span>,
-      <span class="json-key">"status"</span>: <span class="json-str">"linked"</span>,
-      <span class="json-key">"cpls"</span>: <span class="json-num">1</span>,
-      <span class="json-key">"kdm"</span>: <span class="json-num">1</span>,
-      <span class="json-key">"kdm_notes"</span>: { <span class="json-key">"status"</span>: <span class="json-str">"ok"</span>, <span class="json-key">"expires"</span>: <span class="json-str">"2026-06-09"</span> },
-      <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> },
-      <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
-      <span class="json-key">"screen"</span>: { <span class="json-key">"id"</span>: <span class="json-num">3</span>, <span class="json-key">"screen_name"</span>: <span class="json-str">"Screen 3"</span> }
+    <span class="json-key">"id"</span>: <span class="json-num">101</span>,
+    <span class="json-key">"noc_schedule_id"</span>: <span class="json-str">"SCH_2026_06_08_S3_001"</span>,
+    <span class="json-key">"display_title"</span>: <span class="json-str">"Inception - Dolby Atmos"</span>,
+    <span class="json-key">"type"</span>: <span class="json-str">"Feature"</span>,
+    <span class="json-key">"date_start"</span>: <span class="json-str">"2026-06-08T14:00:00.000000Z"</span>,
+    <span class="json-key">"date_end"</span>: <span class="json-str">"2026-06-08T16:30:00.000000Z"</span>,
+    <span class="json-key">"status"</span>: <span class="json-str">"linked"</span>,
+    <span class="json-key">"cpls"</span>: <span class="json-num">1</span>,
+    <span class="json-key">"kdm"</span>: <span class="json-num">1</span>,
+    <span class="json-key">"kdm_notes"</span>: { <span class="json-key">"status"</span>: <span class="json-str">"ok"</span>, <span class="json-key">"expires"</span>: <span class="json-str">"2026-06-09"</span> },
+    <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> },
+    <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
+    <span class="json-key">"screen"</span>: { <span class="json-key">"id"</span>: <span class="json-num">3</span>, <span class="json-key">"screen_name"</span>: <span class="json-str">"Screen 3"</span> }
     }
-  ]
+]
 }</pre>
         </div>
 
         <div class="response-tabs">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- UNLINKED -->
     <div class="endpoint" id="schedules-unlinked">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/schedules/issues/unlinked</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">
-          Returns schedules where <code>status != "linked"</code> — screenings that are not properly linked to content. Same response shape as schedule index.
+        Returns schedules where <code>status != "linked"</code> — screenings that are not properly linked to content. Same response shape as schedule index.
         </p>
         <div class="table-label">Query Parameters</div>
         <table>
-          <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Default</th></tr></thead>
-          <tbody>
+        <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Default</th></tr></thead>
+        <tbody>
             <tr><td class="field-name">date</td><td class="field-type">string (YYYY-MM-DD)</td><td><span class="tag tag-opt">optional</span></td><td>today</td></tr>
-          </tbody>
+        </tbody>
         </table>
         <div class="response-tabs" style="margin-top:12px">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- MISSING CPLS -->
     <div class="endpoint" id="schedules-missing-cpls">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/schedules/issues/missing-cpls</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">
-          Linked schedules with <code>cpls = 0</code> — the content playlist is not available on the server.
+        Linked schedules with <code>cpls = 0</code> — the content playlist is not available on the server.
         </p>
         <div class="table-label">Query Parameters</div>
         <table>
-          <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Default</th></tr></thead>
-          <tbody>
+        <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Default</th></tr></thead>
+        <tbody>
             <tr><td class="field-name">date</td><td class="field-type">string (YYYY-MM-DD)</td><td><span class="tag tag-opt">optional</span></td><td>today</td></tr>
-          </tbody>
+        </tbody>
         </table>
         <div class="response-tabs" style="margin-top:12px">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- MISSING KDMS -->
     <div class="endpoint" id="schedules-missing-kdms">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/schedules/issues/missing-kdms</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">
-          Linked schedules with CPL present but <code>kdm != 1</code> — the KDM decryption key is missing.
+        Linked schedules with CPL present but <code>kdm != 1</code> — the KDM decryption key is missing.
         </p>
         <div class="table-label">Query Parameters</div>
         <table>
-          <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Default</th></tr></thead>
-          <tbody>
+        <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Default</th></tr></thead>
+        <tbody>
             <tr><td class="field-name">date</td><td class="field-type">string (YYYY-MM-DD)</td><td><span class="tag tag-opt">optional</span></td><td>today</td></tr>
-          </tbody>
+        </tbody>
         </table>
         <div class="response-tabs" style="margin-top:12px">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- KDM EXPIRED -->
     <div class="endpoint" id="schedules-kdm-expired">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/schedules/issues/kdm-expired</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">
-          Schedules where <code>kdm = 2</code> — the KDM has expired and the film cannot be played.
+        Schedules where <code>kdm = 2</code> — the KDM has expired and the film cannot be played.
         </p>
         <div class="table-label">Query Parameters</div>
         <table>
-          <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Default</th></tr></thead>
-          <tbody>
+        <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Default</th></tr></thead>
+        <tbody>
             <tr><td class="field-name">date</td><td class="field-type">string (YYYY-MM-DD)</td><td><span class="tag tag-opt">optional</span></td><td>today</td></tr>
-          </tbody>
+        </tbody>
         </table>
         <div class="response-tabs" style="margin-top:12px">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- KDM EXPIRING -->
     <div class="endpoint" id="schedules-kdm-expiring">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/schedules/issues/kdm-expiring</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">
-          Future schedules whose KDM will expire soon. Detected via <code>kdm_notes.status = "warning"</code>.
+        Future schedules whose KDM will expire soon. Detected via <code>kdm_notes.status = "warning"</code>.
         </p>
         <div class="table-label">Query Parameters</div>
         <table>
-          <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
-          <tbody>
+        <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
             <tr><td class="field-name">hours</td><td class="field-type">integer</td><td><span class="tag tag-opt">optional</span></td><td>48</td><td>Look-ahead window in hours</td></tr>
-          </tbody>
+        </tbody>
         </table>
         <div class="notice notice-warn" style="margin-top:12px">
-          <span>⚠️</span>
-          <div>This endpoint uses <code>kdm_notes.status</code> from the JSON field, not the numeric <code>kdm</code> column. Ensure your display logic checks <code>kdm_notes.status === "warning"</code> to show expiry warnings.</div>
+        <span>⚠️</span>
+        <div>This endpoint uses <code>kdm_notes.status</code> from the JSON field, not the numeric <code>kdm</code> column. Ensure your display logic checks <code>kdm_notes.status === "warning"</code> to show expiry warnings.</div>
         </div>
         <div class="response-tabs" style="margin-top:12px">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
     </div>
-  </section>
+    </div>
+</section>
 
-  <hr />
+<hr />
 
-  <!-- ══════════════════════════════════════════════ -->
-  <!--  ERRORS                                        -->
-  <!-- ══════════════════════════════════════════════ -->
-  <section>
+<!-- ══════════════════════════════════════════════ -->
+<!--  ERRORS                                        -->
+<!-- ══════════════════════════════════════════════ -->
+<section>
     <div class="section-title">
-      <div class="icon" style="background:#450a0a">🚨</div>
-      Errors &amp; Alerts
+    <div class="icon" style="background:#450a0a">🚨</div>
+    Errors &amp; Alerts
     </div>
     <p class="section-subtitle">
-      All error endpoints return data scoped to the authenticated user's assigned locations.
-      Data is refreshed by the NOC sync process.
+    All error endpoints return data scoped to the authenticated user's assigned locations.
+    Data is refreshed by the NOC sync process.
     </p>
 
     <!-- SUMMARY -->
     <div class="endpoint" id="errors-summary">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/errors/summary</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">
-          Aggregated error counters across all the user's locations. Ideal for a dashboard overview screen.
+        Aggregated error counters across all the user's locations. Ideal for a dashboard overview screen.
         </p>
         <div class="code-block">
-          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
-          <pre>{
-  <span class="json-key">"kdm_errors"</span>: <span class="json-num">3</span>,
-  <span class="json-key">"nbr_sound_alert"</span>: <span class="json-num">1</span>,
-  <span class="json-key">"nbr_projector_alert"</span>: <span class="json-num">0</span>,
-  <span class="json-key">"nbr_server_alert"</span>: <span class="json-num">2</span>,
-  <span class="json-key">"nbr_storage_errors"</span>: <span class="json-num">0</span>,
-  <span class="json-key">"total_errors"</span>: <span class="json-num">6</span>
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"kdm_errors"</span>: <span class="json-num">3</span>,
+<span class="json-key">"nbr_sound_alert"</span>: <span class="json-num">1</span>,
+<span class="json-key">"nbr_projector_alert"</span>: <span class="json-num">0</span>,
+<span class="json-key">"nbr_server_alert"</span>: <span class="json-num">2</span>,
+<span class="json-key">"nbr_storage_errors"</span>: <span class="json-num">0</span>,
+<span class="json-key">"total_errors"</span>: <span class="json-num">6</span>
 }</pre>
         </div>
         <div class="response-tabs">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- KDM ERRORS -->
     <div class="endpoint" id="errors-kdm">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/errors/kdm</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">KDM-related errors — expired or missing decryption keys for digital cinema packages.</p>
         <div class="code-block">
-          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
-          <pre>{
-  <span class="json-key">"kdms_errors_list"</span>: [
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"kdms_errors_list"</span>: [
     {
-      <span class="json-key">"id"</span>: <span class="json-num">10</span>,
-      <span class="json-key">"cpl_id"</span>: <span class="json-str">"urn:uuid:abc123"</span>,
-      <span class="json-key">"annotation_text"</span>: <span class="json-str">"Inception Feature"</span>,
-      <span class="json-key">"details"</span>: <span class="json-str">"KDM expired on 2026-06-07"</span>,
-      <span class="json-key">"server_name"</span>: <span class="json-str">"SRV-01"</span>,
-      <span class="json-key">"date_time"</span>: <span class="json-str">"2026-06-08T12:00:00.000000Z"</span>,
-      <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
-      <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
+    <span class="json-key">"id"</span>: <span class="json-num">10</span>,
+    <span class="json-key">"cpl_id"</span>: <span class="json-str">"urn:uuid:abc123"</span>,
+    <span class="json-key">"annotation_text"</span>: <span class="json-str">"Inception Feature"</span>,
+    <span class="json-key">"details"</span>: <span class="json-str">"KDM expired on 2026-06-07"</span>,
+    <span class="json-key">"server_name"</span>: <span class="json-str">"SRV-01"</span>,
+    <span class="json-key">"date_time"</span>: <span class="json-str">"2026-06-08T12:00:00.000000Z"</span>,
+    <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
+    <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
     }
-  ]
+]
 }</pre>
         </div>
         <div class="response-tabs">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- SERVER ERRORS -->
     <div class="endpoint" id="errors-server">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/errors/server</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">Server-level error events from cinema servers.</p>
         <div class="code-block">
-          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
-          <pre>{
-  <span class="json-key">"server_errors_list"</span>: [
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"server_errors_list"</span>: [
     {
-      <span class="json-key">"id"</span>: <span class="json-num">5</span>,
-      <span class="json-key">"event_id"</span>: <span class="json-str">"EVT-2026-001"</span>,
-      <span class="json-key">"date"</span>: <span class="json-str">"2026-06-08T10:15:00.000000Z"</span>,
-      <span class="json-key">"class"</span>: <span class="json-str">"Hardware"</span>,
-      <span class="json-key">"type"</span>: <span class="json-str">"Disk"</span>,
-      <span class="json-key">"sub_type"</span>: <span class="json-str">"ReadError"</span>,
-      <span class="json-key">"criticity"</span>: <span class="json-str">"Critical"</span>,
-      <span class="json-key">"error_code"</span>: <span class="json-str">"0x0021"</span>,
-      <span class="json-key">"server_name"</span>: <span class="json-str">"GDC-SRV-01"</span>,
-      <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
-      <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
+    <span class="json-key">"id"</span>: <span class="json-num">5</span>,
+    <span class="json-key">"event_id"</span>: <span class="json-str">"EVT-2026-001"</span>,
+    <span class="json-key">"date"</span>: <span class="json-str">"2026-06-08T10:15:00.000000Z"</span>,
+    <span class="json-key">"class"</span>: <span class="json-str">"Hardware"</span>,
+    <span class="json-key">"type"</span>: <span class="json-str">"Disk"</span>,
+    <span class="json-key">"sub_type"</span>: <span class="json-str">"ReadError"</span>,
+    <span class="json-key">"criticity"</span>: <span class="json-str">"Critical"</span>,
+    <span class="json-key">"error_code"</span>: <span class="json-str">"0x0021"</span>,
+    <span class="json-key">"server_name"</span>: <span class="json-str">"GDC-SRV-01"</span>,
+    <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
+    <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
     }
-  ]
+]
 }</pre>
         </div>
         <div class="response-tabs">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- PROJECTOR ERRORS -->
     <div class="endpoint" id="errors-projector">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/errors/projector</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">Projector fault events (lamp failures, overheating, lens issues, etc.).</p>
         <div class="code-block">
-          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
-          <pre>{
-  <span class="json-key">"projector_errors_list"</span>: [
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"projector_errors_list"</span>: [
     {
-      <span class="json-key">"id"</span>: <span class="json-num">7</span>,
-      <span class="json-key">"title"</span>: <span class="json-str">"Lamp failure"</span>,
-      <span class="json-key">"time_saved"</span>: <span class="json-str">"2026-06-08T08:00:00.000000Z"</span>,
-      <span class="json-key">"code"</span>: <span class="json-str">"PRJ-LAMP-001"</span>,
-      <span class="json-key">"severity"</span>: <span class="json-str">"Critical"</span>,
-      <span class="json-key">"message"</span>: <span class="json-str">"Lamp arc failure detected on Screen 2"</span>,
-      <span class="json-key">"server_name"</span>: <span class="json-str">"Barco-DP4K-S2"</span>,
-      <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
-      <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
+    <span class="json-key">"id"</span>: <span class="json-num">7</span>,
+    <span class="json-key">"title"</span>: <span class="json-str">"Lamp failure"</span>,
+    <span class="json-key">"time_saved"</span>: <span class="json-str">"2026-06-08T08:00:00.000000Z"</span>,
+    <span class="json-key">"code"</span>: <span class="json-str">"PRJ-LAMP-001"</span>,
+    <span class="json-key">"severity"</span>: <span class="json-str">"Critical"</span>,
+    <span class="json-key">"message"</span>: <span class="json-str">"Lamp arc failure detected on Screen 2"</span>,
+    <span class="json-key">"server_name"</span>: <span class="json-str">"Barco-DP4K-S2"</span>,
+    <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
+    <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
     }
-  ]
+]
 }</pre>
         </div>
         <div class="response-tabs">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- SOUND ERRORS -->
     <div class="endpoint" id="errors-sound">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/errors/sound</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">Sound processor alarms and audio system issues.</p>
         <div class="code-block">
-          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
-          <pre>{
-  <span class="json-key">"sounds_errors_list"</span>: [
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"sounds_errors_list"</span>: [
     {
-      <span class="json-key">"id"</span>: <span class="json-num">3</span>,
-      <span class="json-key">"alarm_id"</span>: <span class="json-str">"ALM-SND-099"</span>,
-      <span class="json-key">"date_saved"</span>: <span class="json-str">"2026-06-08T09:30:00.000000Z"</span>,
-      <span class="json-key">"severity"</span>: <span class="json-str">"Warning"</span>,
-      <span class="json-key">"title"</span>: <span class="json-str">"Audio channel clipping"</span>,
-      <span class="json-key">"clearable"</span>: <span class="json-bool">true</span>,
-      <span class="json-key">"hardware"</span>: <span class="json-str">"QSC Q-SYS"</span>,
-      <span class="json-key">"screen"</span>: <span class="json-str">"Screen 1"</span>,
-      <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
-      <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
+    <span class="json-key">"id"</span>: <span class="json-num">3</span>,
+    <span class="json-key">"alarm_id"</span>: <span class="json-str">"ALM-SND-099"</span>,
+    <span class="json-key">"date_saved"</span>: <span class="json-str">"2026-06-08T09:30:00.000000Z"</span>,
+    <span class="json-key">"severity"</span>: <span class="json-str">"Warning"</span>,
+    <span class="json-key">"title"</span>: <span class="json-str">"Audio channel clipping"</span>,
+    <span class="json-key">"clearable"</span>: <span class="json-bool">true</span>,
+    <span class="json-key">"hardware"</span>: <span class="json-str">"QSC Q-SYS"</span>,
+    <span class="json-key">"screen"</span>: <span class="json-str">"Screen 1"</span>,
+    <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
+    <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
     }
-  ]
+]
 }</pre>
         </div>
         <div class="response-tabs">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- STORAGE ERRORS -->
     <div class="endpoint" id="errors-storage">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/errors/storage</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">Storage-related errors on cinema servers (full disks, I/O errors, etc.).</p>
         <div class="code-block">
-          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
-          <pre>{
-  <span class="json-key">"storage_errors_list"</span>: [
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"storage_errors_list"</span>: [
     {
-      <span class="json-key">"id"</span>: <span class="json-num">2</span>,
-      <span class="json-key">"server_name"</span>: <span class="json-str">"GDC-SRV-02"</span>,
-      <span class="json-key">"synced_at"</span>: <span class="json-str">"2026-06-08T14:00:00.000000Z"</span>,
-      <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
-      <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
+    <span class="json-key">"id"</span>: <span class="json-num">2</span>,
+    <span class="json-key">"server_name"</span>: <span class="json-str">"GDC-SRV-02"</span>,
+    <span class="json-key">"synced_at"</span>: <span class="json-str">"2026-06-08T14:00:00.000000Z"</span>,
+    <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
+    <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
     }
-  ]
+]
 }</pre>
         </div>
         <div class="response-tabs">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- RAID ALERTS -->
     <div class="endpoint" id="errors-raid">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/errors/raid</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">RAID array health alerts from cinema servers.</p>
         <div class="code-block">
-          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
-          <pre>{
-  <span class="json-key">"alerts"</span>: [
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"alerts"</span>: [
     {
-      <span class="json-key">"id"</span>: <span class="json-num">1</span>,
-      <span class="json-key">"count_alerts"</span>: <span class="json-num">2</span>,
-      <span class="json-key">"alerts"</span>: [
+    <span class="json-key">"id"</span>: <span class="json-num">1</span>,
+    <span class="json-key">"count_alerts"</span>: <span class="json-num">2</span>,
+    <span class="json-key">"alerts"</span>: [
         { <span class="json-key">"disk"</span>: <span class="json-num">3</span>, <span class="json-key">"state"</span>: <span class="json-str">"degraded"</span> },
         { <span class="json-key">"disk"</span>: <span class="json-num">4</span>, <span class="json-key">"state"</span>: <span class="json-str">"failed"</span> }
-      ],
-      <span class="json-key">"synced_at"</span>: <span class="json-str">"2026-06-08T14:00:00.000000Z"</span>,
-      <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
-      <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
+    ],
+    <span class="json-key">"synced_at"</span>: <span class="json-str">"2026-06-08T14:00:00.000000Z"</span>,
+    <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
+    <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
     }
-  ]
+]
 }</pre>
         </div>
         <div class="response-tabs">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
         </div>
-      </div>
+    </div>
     </div>
 
     <!-- SERVER ALARMS -->
     <div class="endpoint" id="errors-alarms">
-      <div class="endpoint-header">
+    <div class="endpoint-header">
         <span class="badge badge-get">GET</span>
         <span class="endpoint-path">/api/hub/mobile/errors/server-alarms</span>
         <span class="auth-badge">Auth Required</span>
-      </div>
-      <div class="endpoint-body">
+    </div>
+    <div class="endpoint-body">
         <p class="endpoint-desc-text">
-          SNMP server alarms with working state information. The <code>index_alarm</code> field is always an integer (SNMP type prefixes like <code>Counter32:</code> are stripped server-side).
+        SNMP server alarms with working state information. The <code>index_alarm</code> field is always an integer (SNMP type prefixes like <code>Counter32:</code> are stripped server-side).
         </p>
         <div class="code-block">
-          <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
-          <pre>{
-  <span class="json-key">"alarms"</span>: [
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"alarms"</span>: [
     {
-      <span class="json-key">"id"</span>: <span class="json-num">1</span>,
-      <span class="json-key">"screen_id"</span>: <span class="json-num">3</span>,
-      <span class="json-key">"alarm_working_state"</span>: <span class="json-str">"Normal"</span>,
-      <span class="json-key">"index_alarm"</span>: <span class="json-num">1</span>,           <span class="json-comment">// always integer</span>
-      <span class="json-key">"title"</span>: <span class="json-str">"Host Memory"</span>,
-      <span class="json-key">"synced_at"</span>: <span class="json-str">"2026-06-08T14:30:00.000000Z"</span>,
-      <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
-      <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> },
-      <span class="json-key">"screen"</span>: { <span class="json-key">"id"</span>: <span class="json-num">3</span>, <span class="json-key">"screen_name"</span>: <span class="json-str">"Screen 3"</span> }
+    <span class="json-key">"id"</span>: <span class="json-num">1</span>,
+    <span class="json-key">"screen_id"</span>: <span class="json-num">3</span>,
+    <span class="json-key">"alarm_working_state"</span>: <span class="json-str">"Normal"</span>,
+    <span class="json-key">"index_alarm"</span>: <span class="json-num">1</span>,           <span class="json-comment">// always integer</span>
+    <span class="json-key">"title"</span>: <span class="json-str">"Host Memory"</span>,
+    <span class="json-key">"synced_at"</span>: <span class="json-str">"2026-06-08T14:30:00.000000Z"</span>,
+    <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
+    <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> },
+    <span class="json-key">"screen"</span>: { <span class="json-key">"id"</span>: <span class="json-num">3</span>, <span class="json-key">"screen_name"</span>: <span class="json-str">"Screen 3"</span> }
     }
-  ]
+]
 }</pre>
         </div>
         <div class="response-tabs">
-          <span class="resp-tab resp-200">200 OK</span>
-          <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        </div>
+    </div>
+    </div>
+</section>
+
+<hr />
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  NOC SYNC API — PLAYBACK DETAILS              -->
+<!-- ══════════════════════════════════════════════ -->
+<section>
+  <div class="section-title">
+    <div class="icon" style="background:#431407">📡</div>
+    NOC Sync API — Playback Details
+  </div>
+  <p class="section-subtitle">
+    Endpoint called by NOC instances to push hardware detail data to the hub.
+    Authentication: <code>Authorization: Bearer {noc_instance.api_key}</code>.
+    This is a server-to-server push — <strong>not called by the mobile app</strong>.
+  </p>
+
+  <div class="endpoint" id="noc-playback-details">
+    <div class="endpoint-header">
+      <span class="badge badge-post">POST</span>
+      <span class="endpoint-path">/api/noc/playback-details/sync</span>
+      <span class="auth-badge" style="background:var(--orange-dim);color:var(--orange)">NOC API Key</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc-text">
+        Receives server details, projector details, sound details, storage devices, SMART health data,
+        and lamp history for all screens of the NOC instance. All sub-arrays are optional — only include
+        the types that have changed.
+      </p>
+
+      <div class="notice notice-warn">
+        <span>⚠️</span>
+        <div>This endpoint uses <strong>upsert logic</strong> (<code>updateOrCreate</code> keyed by <code>noc_instance_id + screen_id</code>).
+        Sending data replaces the existing record for that screen.</div>
+      </div>
+
+      <div class="table-label">Request Body — top-level keys (all optional)</div>
+      <table>
+        <thead><tr><th>Key</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">server_details</td><td class="field-type">array</td><td>Server hardware info per screen</td></tr>
+          <tr><td class="field-name">projector_details</td><td class="field-type">array</td><td>Projector specs + light source per screen</td></tr>
+          <tr><td class="field-name">sound_details</td><td class="field-type">array</td><td>Audio processor info per screen</td></tr>
+          <tr><td class="field-name">storage_devices</td><td class="field-type">array</td><td>Storage disk list per screen (multiple per screen)</td></tr>
+          <tr><td class="field-name">server_smarts</td><td class="field-type">array</td><td>SMART disk health per screen</td></tr>
+          <tr><td class="field-name">light_histories</td><td class="field-type">array</td><td>Lamp history per screen (multiple per screen)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="table-label">Common fields on every item (all arrays)</div>
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">noc_location_id</td><td class="field-type">integer</td><td><span class="tag tag-req">required</span></td><td>NOC-side location ID</td></tr>
+          <tr><td class="field-name">noc_screen_id</td><td class="field-type">integer</td><td><span class="tag tag-req">required</span></td><td>NOC-side screen ID</td></tr>
+          <tr><td class="field-name">location</td><td class="field-type">object</td><td><span class="tag tag-opt">optional</span></td><td>Location metadata <code>{name, city, country, state, company, tms_system}</code></td></tr>
+          <tr><td class="field-name">screen</td><td class="field-type">object</td><td><span class="tag tag-opt">optional</span></td><td>Screen metadata <code>{screen_name, screen_number, screenModel}</code></td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-block">
+        <div class="code-block-header"><span>Request Example</span><span>POST /api/noc/playback-details/sync</span></div>
+        <pre>{
+  <span class="json-key">"server_details"</span>: [
+    {
+      <span class="json-key">"noc_location_id"</span>: <span class="json-num">1</span>,
+      <span class="json-key">"noc_screen_id"</span>: <span class="json-num">3</span>,
+      <span class="json-key">"serialNumber"</span>: <span class="json-str">"GDC-SX3000-00123"</span>,          <span class="json-comment">// or serial_number</span>
+      <span class="json-key">"mainSoftwareVersion"</span>: <span class="json-str">"10.4.2"</span>,              <span class="json-comment">// or main_software_version</span>
+      <span class="json-key">"mainFirmwareVersion"</span>: <span class="json-str">"3.1.0"</span>,               <span class="json-comment">// or main_firmware_version</span>
+      <span class="json-key">"bundleVersion"</span>: <span class="json-str">"2026.01"</span>,                    <span class="json-comment">// or bundle_version</span>
+      <span class="json-key">"certificat_date"</span>: <span class="json-str">"2027-01-01"</span>
+    }
+  ],
+  <span class="json-key">"projector_details"</span>: [
+    {
+      <span class="json-key">"noc_location_id"</span>: <span class="json-num">1</span>,
+      <span class="json-key">"noc_screen_id"</span>: <span class="json-num">3</span>,
+      <span class="json-key">"System_Details_Model"</span>: <span class="json-str">"Barco DP4K-32B"</span>,
+      <span class="json-key">"System_Details_Serial_Number"</span>: <span class="json-str">"1234567890"</span>,
+      <span class="json-key">"System_Details_Software_Version"</span>: <span class="json-str">"4.8.0"</span>,
+      <span class="json-key">"System_Status_Operating_Hours"</span>: <span class="json-str">"18742"</span>,
+      <span class="json-key">"System_Status_Power_Status"</span>: <span class="json-str">"ON"</span>,
+      <span class="json-key">"System_Status_Shutter_Status"</span>: <span class="json-str">"Open"</span>,
+      <span class="json-key">"System_Status_Light_Status"</span>: <span class="json-str">"On"</span>,
+      <span class="json-key">"Light_Model"</span>: <span class="json-str">"OSRAM XBO 4000W"</span>,
+      <span class="json-key">"Light_Serial"</span>: <span class="json-str">"LMP-2024-001"</span>,
+      <span class="json-key">"Light_Hours"</span>: <span class="json-str">"342"</span>
+    }
+  ],
+  <span class="json-key">"sound_details"</span>: [
+    {
+      <span class="json-key">"noc_location_id"</span>: <span class="json-num">1</span>,
+      <span class="json-key">"noc_screen_id"</span>: <span class="json-num">3</span>,
+      <span class="json-key">"model"</span>: <span class="json-str">"Dolby CP850"</span>,
+      <span class="json-key">"serial_number"</span>: <span class="json-str">"CP850-00987"</span>,
+      <span class="json-key">"software"</span>: <span class="json-str">"7.5.1"</span>,
+      <span class="json-key">"bypass"</span>: <span class="json-str">"Off"</span>,
+      <span class="json-key">"power_supply"</span>: <span class="json-str">"OK"</span>,
+      <span class="json-key">"aes_status"</span>: <span class="json-str">"Locked"</span>,
+      <span class="json-key">"alert"</span>: <span class="json-null">null</span>
+    }
+  ],
+  <span class="json-key">"storage_devices"</span>: [
+    {
+      <span class="json-key">"noc_location_id"</span>: <span class="json-num">1</span>,
+      <span class="json-key">"noc_screen_id"</span>: <span class="json-num">3</span>,
+      <span class="json-key">"Index_storage"</span>: <span class="json-num">0</span>,
+      <span class="json-key">"Bus"</span>: <span class="json-str">"SATA"</span>,
+      <span class="json-key">"Capacity"</span>: <span class="json-str">"4TB"</span>,
+      <span class="json-key">"Model"</span>: <span class="json-str">"WDC WD4000FYYZ"</span>,
+      <span class="json-key">"Storage_Working_State"</span>: <span class="json-str">"Online"</span>,
+      <span class="json-key">"Type"</span>: <span class="json-str">"HDD"</span>
+    }
+  ],
+  <span class="json-key">"server_smarts"</span>: [
+    {
+      <span class="json-key">"noc_location_id"</span>: <span class="json-num">1</span>,
+      <span class="json-key">"noc_screen_id"</span>: <span class="json-num">3</span>,
+      <span class="json-key">"Overall_Health"</span>: <span class="json-str">"PASSED"</span>,
+      <span class="json-key">"Temperature"</span>: <span class="json-str">"36"</span>,
+      <span class="json-key">"Power_On_Hours"</span>: <span class="json-str">"12450"</span>,
+      <span class="json-key">"Reallocated_Sector_Count"</span>: <span class="json-str">"0"</span>,
+      <span class="json-key">"Scan_Date"</span>: <span class="json-str">"2026-06-08"</span>
+    }
+  ],
+  <span class="json-key">"light_histories"</span>: [
+    {
+      <span class="json-key">"noc_location_id"</span>: <span class="json-num">1</span>,
+      <span class="json-key">"noc_screen_id"</span>: <span class="json-num">3</span>,
+      <span class="json-key">"Index_lamp"</span>: <span class="json-num">1</span>,
+      <span class="json-key">"Serial_Number"</span>: <span class="json-str">"LMP-2024-001"</span>,
+      <span class="json-key">"Type"</span>: <span class="json-str">"Xenon"</span>,
+      <span class="json-key">"Hours"</span>: <span class="json-str">"342"</span>,
+      <span class="json-key">"Power_Range"</span>: <span class="json-str">"3500W"</span>,
+      <span class="json-key">"Date_lamp"</span>: <span class="json-str">"2024-11-02"</span>
+    }
+  ]
+}</pre>
+      </div>
+
+      <div class="table-label">Response 200 OK</div>
+      <div class="code-block">
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+  <span class="json-key">"message"</span>: <span class="json-str">"6 detail record(s) synced."</span>,
+  <span class="json-key">"synced"</span>: <span class="json-num">6</span>
+}</pre>
+      </div>
+
+      <div class="notice notice-info" style="margin-top:12px">
+        <span>ℹ️</span>
+        <div>
+          Both <strong>camelCase</strong> (e.g. <code>serialNumber</code>) and <strong>snake_case</strong>
+          (e.g. <code>serial_number</code>) field names are accepted. The controller resolves both variants.
+          PascalCase NOC keys (e.g. <code>System_Details_Model</code>) are also accepted for projector fields.
         </div>
       </div>
+
+      <div class="response-tabs" style="margin-top:12px">
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Invalid NOC API key</span>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <hr />
+<hr />
 
-  <!-- ══════════════════════════════════════════════ -->
-  <!--  DATA MODELS                                   -->
-  <!-- ══════════════════════════════════════════════ -->
-  <section id="models">
+<!-- ══════════════════════════════════════════════ -->
+<!--  DATA MODELS                                   -->
+<!-- ══════════════════════════════════════════════ -->
+<section id="models">
     <div class="section-title">
-      <div class="icon" style="background:#2e3350">📦</div>
-      Data Models
+    <div class="icon" style="background:#2e3350">📦</div>
+    Data Models
     </div>
     <p class="section-subtitle">Key data structures and field reference used across API responses.</p>
 
     <!-- KDM values -->
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px">
-      <div style="font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text)">KDM Status Values</div>
-      <table>
+    <div style="font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text)">KDM Status Values</div>
+    <table>
         <thead><tr><th>Value</th><th>Meaning</th><th>Action Required</th></tr></thead>
         <tbody>
-          <tr><td><code>0</code></td><td>KDM pending / not yet received</td><td>Follow up with distributor</td></tr>
-          <tr><td><code>1</code></td><td>KDM ready and valid</td><td>No action needed</td></tr>
-          <tr><td><code>2</code></td><td>KDM expired</td><td>Request a new KDM immediately</td></tr>
+        <tr><td><code>0</code></td><td>KDM pending / not yet received</td><td>Follow up with distributor</td></tr>
+        <tr><td><code>1</code></td><td>KDM ready and valid</td><td>No action needed</td></tr>
+        <tr><td><code>2</code></td><td>KDM expired</td><td>Request a new KDM immediately</td></tr>
         </tbody>
-      </table>
+    </table>
     </div>
 
     <!-- Role values -->
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px">
-      <div style="font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text)">User Roles</div>
-      <table>
+    <div style="font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text)">User Roles</div>
+    <table>
         <thead><tr><th>role (integer)</th><th>label (string)</th><th>Access Level</th></tr></thead>
         <tbody>
-          <tr><td><code>1</code></td><td><code>Admin</code></td><td>Full access across all locations</td></tr>
-          <tr><td><code>2</code></td><td><code>Manager</code></td><td>Access to assigned locations</td></tr>
-          <tr><td><code>3</code></td><td><code>Cinema Staff</code></td><td>Limited read access</td></tr>
+        <tr><td><code>1</code></td><td><code>Admin</code></td><td>Full access across all locations</td></tr>
+        <tr><td><code>2</code></td><td><code>Manager</code></td><td>Access to assigned locations</td></tr>
+        <tr><td><code>3</code></td><td><code>Cinema Staff</code></td><td>Limited read access</td></tr>
         </tbody>
-      </table>
-      <div class="notice notice-info" style="margin-top:12px">
+    </table>
+    <div class="notice notice-info" style="margin-top:12px">
         <span>ℹ️</span>
         <div>The <code>role</code> field in API responses is returned as a human-readable <strong>string label</strong> (e.g. <code>"Admin"</code>), not the numeric value.</div>
-      </div>
+    </div>
     </div>
 
     <!-- Datetime format -->
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px">
-      <div style="font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text)">Datetime Format</div>
-      <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px">
+    <div style="font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text)">Datetime Format</div>
+    <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px">
         All datetime fields are returned in <strong>ISO 8601 UTC</strong> format.
-      </p>
-      <div class="code-block">
+    </p>
+    <div class="code-block">
         <div class="code-block-header"><span>Example</span></div>
         <pre><span class="json-str">"2026-06-08T14:30:00.000000Z"</span></pre>
-      </div>
-      <div class="notice notice-warn" style="margin-top:10px">
+    </div>
+    <div class="notice notice-warn" style="margin-top:10px">
         <span>⚠️</span>
         <div>Convert to the device's local timezone before displaying to the user. Never render raw UTC timestamps.</div>
-      </div>
+    </div>
     </div>
 
     <!-- Quick-start -->
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px">
-      <div style="font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text)">Quick-Start Flow</div>
-      <div class="code-block">
+    <div style="font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text)">Quick-Start Flow</div>
+    <div class="code-block">
         <div class="code-block-header"><span>Typical Mobile App Session</span></div>
         <pre><span class="json-comment">// 1. Login — get token</span>
 POST /api/hub/mobile/login
-  → save token + user info locally
+→ save token + user info locally
 
 <span class="json-comment">// 2. Attach token to all future requests</span>
 Authorization: Bearer {token}
@@ -1399,29 +1857,29 @@ GET /api/hub/mobile/schedules/issues/kdm-expired
 
 <span class="json-comment">// 8. Logout when done</span>
 POST /api/hub/mobile/logout</pre>
-      </div>
     </div>
-  </section>
+    </div>
+</section>
 
-  <div style="margin-top:64px;padding-top:32px;border-top:1px solid var(--border);color:var(--text-dim);font-size:12px;text-align:center">
+<div style="margin-top:64px;padding-top:32px;border-top:1px solid var(--border);color:var(--text-dim);font-size:12px;text-align:center">
     Sentinel NOC Hub — Mobile API Documentation &nbsp;·&nbsp; Generated 2026-06-08 &nbsp;·&nbsp; For internal use only
-  </div>
+</div>
 </main>
 
 <script>
-  // Active nav highlight on scroll
-  const sections = document.querySelectorAll('[id]');
-  const navLinks = document.querySelectorAll('.nav-link');
-  const observer = new IntersectionObserver(entries => {
+// Active nav highlight on scroll
+const sections = document.querySelectorAll('[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (e.isIntersecting) {
+    if (e.isIntersecting) {
         navLinks.forEach(l => l.classList.remove('active'));
         const active = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
         if (active) active.classList.add('active');
-      }
+    }
     });
-  }, { rootMargin: '-20% 0px -75% 0px' });
-  sections.forEach(s => observer.observe(s));
+}, { rootMargin: '-20% 0px -75% 0px' });
+sections.forEach(s => observer.observe(s));
 </script>
 </body>
 </html>
