@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\HubSchedule;
+use App\Models\HubScreen;
 use App\Models\Location;
 use App\Models\NocInstance;
 use Carbon\Carbon;
@@ -18,8 +19,18 @@ class HubScheduleAdminController extends Controller
         $date         = $request->input('date', Carbon::today()->format('Y-m-d'));
         $tab          = $request->input('tab', 'all');
 
-        $start = Carbon::parse($date)->startOfDay();
-        $end   = Carbon::parse($date)->addDay()->startOfDay();
+        // 5h AM → 4h59 AM next day
+        $start = Carbon::parse($date)->setTime(5, 0, 0);
+        $end   = Carbon::parse($date)->addDay()->setTime(5, 0, 0);
+
+        // Screens list filtered by location if selected
+        $screensQuery = HubScreen::orderBy('screen_number');
+        if ($request->filled('location')) {
+            $screensQuery->where('location_id', $request->location);
+        } elseif ($request->filled('noc')) {
+            $screensQuery->where('noc_instance_id', $request->noc);
+        }
+        $screens = $screensQuery->get();
 
         $query = HubSchedule::with(['nocInstance', 'location', 'screen'])
             ->where('date_start', '>=', $start)
@@ -30,6 +41,9 @@ class HubScheduleAdminController extends Controller
         }
         if ($request->filled('location')) {
             $query->where('location_id', $request->location);
+        }
+        if ($request->filled('screen')) {
+            $query->where('screen_id', $request->screen);
         }
 
         $query = match($tab) {
@@ -47,6 +61,9 @@ class HubScheduleAdminController extends Controller
 
         // Counts for tab badges
         $baseCount = HubSchedule::where('date_start', '>=', $start)->where('date_start', '<', $end);
+        if ($request->filled('noc'))      { $baseCount->where('noc_instance_id', $request->noc); }
+        if ($request->filled('location')) { $baseCount->where('location_id', $request->location); }
+        if ($request->filled('screen'))   { $baseCount->where('screen_id', $request->screen); }
         $counts = [
             'all'          => (clone $baseCount)->count(),
             'unlinked'     => (clone $baseCount)->where('status', '!=', 'linked')->count(),
@@ -56,6 +73,6 @@ class HubScheduleAdminController extends Controller
             'kdm_expiring' => (clone $baseCount)->where('kdm', '!=', 2)->where('kdm_notes', 'like', '%warning%')->count(),
         ];
 
-        return view('admin.hub-schedules.index', compact('schedules', 'nocInstances', 'locations', 'date', 'tab', 'counts'));
+        return view('admin.hub-schedules.index', compact('schedules', 'nocInstances', 'locations', 'screens', 'date', 'tab', 'counts'));
     }
 }

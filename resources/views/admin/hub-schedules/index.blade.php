@@ -9,7 +9,9 @@
       class="mb-4 flex flex-wrap items-end gap-3 rounded-xl bg-white border border-gray-200 px-5 py-4">
 
     <div>
-        <label class="block text-xs font-medium text-gray-500 mb-1">Date</label>
+        <label class="block text-xs font-medium text-gray-500 mb-1">
+            Date <span class="font-normal text-gray-400">(5:00 AM → 4:59 AM)</span>
+        </label>
         <input type="date" name="date" value="{{ $date }}" onchange="this.form.submit()"
                class="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
     </div>
@@ -30,6 +32,18 @@
             <option value="">All Locations</option>
             @foreach($locations as $loc)
                 <option value="{{ $loc->id }}" {{ request('location') == $loc->id ? 'selected' : '' }}>{{ $loc->name }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="min-w-44">
+        <label class="block text-xs font-medium text-gray-500 mb-1">Screen</label>
+        <select name="screen" onchange="this.form.submit()"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+            <option value="">All Screens</option>
+            @foreach($screens as $screen)
+                <option value="{{ $screen->id }}" {{ request('screen') == $screen->id ? 'selected' : '' }}>
+                    {{ $screen->screen_name ?? ('Screen ' . $screen->screen_number) }}
+                </option>
             @endforeach
         </select>
     </div>
