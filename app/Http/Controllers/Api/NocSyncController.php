@@ -5,14 +5,20 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\HubErrorSummary;
 use App\Models\HubKdmError;
+use App\Models\HubLightHistory;
 use App\Models\HubPlayback;
+use App\Models\HubProjectorDetail;
 use App\Models\HubProjectorError;
 use App\Models\HubRaidAlert;
 use App\Models\HubSchedule;
 use App\Models\HubScreen;
 use App\Models\HubServerAlarm;
+use App\Models\HubServerDetail;
 use App\Models\HubServerError;
+use App\Models\HubServerSmart;
+use App\Models\HubSoundDetail;
 use App\Models\HubSoundError;
+use App\Models\HubStorageDevice;
 use App\Models\HubStorageError;
 use App\Models\HubSyncLog;
 use App\Models\Location;
@@ -293,6 +299,197 @@ class NocSyncController extends Controller
         HubSyncLog::create(['noc_instance_id' => $noc->id, 'sync_type' => 'schedules', 'status' => 'success', 'records_synced' => $synced, 'started_at' => $started, 'completed_at' => now()]);
 
         return response()->json(['message' => "{$synced} schedule(s) synced.", 'synced' => $synced]);
+    }
+
+    // ── Playback Details ──────────────────────────────────────────────────────
+
+    /**
+     * POST /api/noc/playback-details/sync
+     * NOC pushes server/projector/sound/storage/smart/lamp detail per screen.
+     */
+    public function syncPlaybackDetails(Request $request): JsonResponse
+    {
+        $noc = $this->authenticateNoc($request);
+        if (!$noc) return response()->json(['message' => 'Invalid API key.'], 401);
+
+        $started = now();
+        $synced  = 0;
+
+        // ── Server details ─────────────────────────────────────────────────
+        foreach ($request->input('server_details', []) as $d) {
+            $nocLocationId = $d['noc_location_id'] ?? null;
+            $nocScreenId   = $d['noc_screen_id']   ?? null;
+            if (!$nocLocationId || !$nocScreenId) continue;
+
+            $location = $this->resolveOrCreateLocation($noc, $nocLocationId, $d['location'] ?? []);
+            $screen   = $this->resolveOrCreateScreen($noc, $location, $nocScreenId, $d['screen'] ?? []);
+
+            HubServerDetail::updateOrCreate(
+                ['noc_instance_id' => $noc->id, 'screen_id' => $screen->id],
+                [
+                    'location_id'           => $location->id,
+                    'screen_number'         => $d['screen_number']          ?? null,
+                    'show_title'            => $d['showTitle']               ?? $d['show_title'] ?? null,
+                    'serial_number'         => $d['serialNumber']            ?? $d['serial_number'] ?? null,
+                    'main_software_version' => $d['mainSoftwareVersion']     ?? $d['main_software_version'] ?? null,
+                    'main_firmware_version' => $d['mainFirmwareVersion']     ?? $d['main_firmware_version'] ?? null,
+                    'bundle_version'        => $d['bundleVersion']           ?? $d['bundle_version'] ?? null,
+                    'certificat_date'       => $d['certificat_date']         ?? null,
+                    'synced_at'             => now(),
+                ]
+            );
+            $synced++;
+        }
+
+        // ── Projector details ──────────────────────────────────────────────
+        foreach ($request->input('projector_details', []) as $d) {
+            $nocLocationId = $d['noc_location_id'] ?? null;
+            $nocScreenId   = $d['noc_screen_id']   ?? null;
+            if (!$nocLocationId || !$nocScreenId) continue;
+
+            $location = $this->resolveOrCreateLocation($noc, $nocLocationId, $d['location'] ?? []);
+            $screen   = $this->resolveOrCreateScreen($noc, $location, $nocScreenId, $d['screen'] ?? []);
+
+            HubProjectorDetail::updateOrCreate(
+                ['noc_instance_id' => $noc->id, 'screen_id' => $screen->id],
+                [
+                    'location_id'             => $location->id,
+                    'system_model'            => $d['System_Details_Model']            ?? $d['system_model'] ?? null,
+                    'system_serial_number'    => $d['System_Details_Serial_Number']    ?? $d['system_serial_number'] ?? null,
+                    'system_manufacture_date' => $d['System_Details_Manufacture_Date'] ?? $d['system_manufacture_date'] ?? null,
+                    'system_software_version' => $d['System_Details_Software_Version'] ?? $d['system_software_version'] ?? null,
+                    'operating_hours'         => $d['System_Status_Operating_Hours']   ?? $d['operating_hours'] ?? null,
+                    'power_status'            => $d['System_Status_Power_Status']      ?? $d['power_status'] ?? null,
+                    'shutter_status'          => $d['System_Status_Shutter_Status']    ?? $d['shutter_status'] ?? null,
+                    'light_status'            => $d['System_Status_Light_Status']      ?? $d['light_status'] ?? null,
+                    'light_model'             => $d['Light_Model']                     ?? $d['light_model'] ?? null,
+                    'light_serial'            => $d['Light_Serial']                    ?? $d['light_serial'] ?? null,
+                    'light_hours'             => $d['Light_Hours']                     ?? $d['light_hours'] ?? null,
+                    'synced_at'               => now(),
+                ]
+            );
+            $synced++;
+        }
+
+        // ── Sound details ──────────────────────────────────────────────────
+        foreach ($request->input('sound_details', []) as $d) {
+            $nocLocationId = $d['noc_location_id'] ?? null;
+            $nocScreenId   = $d['noc_screen_id']   ?? null;
+            if (!$nocLocationId || !$nocScreenId) continue;
+
+            $location = $this->resolveOrCreateLocation($noc, $nocLocationId, $d['location'] ?? []);
+            $screen   = $this->resolveOrCreateScreen($noc, $location, $nocScreenId, $d['screen'] ?? []);
+
+            HubSoundDetail::updateOrCreate(
+                ['noc_instance_id' => $noc->id, 'screen_id' => $screen->id],
+                [
+                    'location_id'          => $location->id,
+                    'model'                => $d['model']                  ?? null,
+                    'serial_number'        => $d['serial_number']          ?? null,
+                    'cat1700_serial_number'=> $d['cat_1700serial_number']  ?? $d['cat1700_serial_number'] ?? null,
+                    'software'             => $d['software']               ?? null,
+                    'bypass'               => $d['bypass']                 ?? null,
+                    'power_supply'         => $d['power_supply']           ?? null,
+                    'aes_status'           => $d['aes_status']             ?? null,
+                    'alert'                => $d['alert']                  ?? null,
+                    'screen_number'        => $d['screen_number']          ?? null,
+                    'synced_at'            => now(),
+                ]
+            );
+            $synced++;
+        }
+
+        // ── Storage devices ────────────────────────────────────────────────
+        if ($request->has('storage_devices')) {
+            foreach ($request->input('storage_devices', []) as $d) {
+                $nocLocationId = $d['noc_location_id'] ?? null;
+                $nocScreenId   = $d['noc_screen_id']   ?? null;
+                if (!$nocLocationId || !$nocScreenId) continue;
+
+                $location = $this->resolveOrCreateLocation($noc, $nocLocationId, $d['location'] ?? []);
+                $screen   = $this->resolveOrCreateScreen($noc, $location, $nocScreenId, $d['screen'] ?? []);
+
+                HubStorageDevice::updateOrCreate(
+                    ['noc_instance_id' => $noc->id, 'screen_id' => $screen->id, 'index_storage' => $d['Index_storage'] ?? $d['index_storage'] ?? null],
+                    [
+                        'location_id'  => $location->id,
+                        'bus'          => $d['Bus']                     ?? $d['bus'] ?? null,
+                        'capacity'     => $d['Capacity']                ?? $d['capacity'] ?? null,
+                        'model'        => $d['Model']                   ?? $d['model'] ?? null,
+                        'serial_number'=> $d['Storage_Serial_Number']   ?? $d['serial_number'] ?? null,
+                        'working_state'=> $d['Storage_Working_State']   ?? $d['working_state'] ?? null,
+                        'title'        => $d['Title']                   ?? $d['title'] ?? null,
+                        'type'         => $d['Type']                    ?? $d['type'] ?? null,
+                        'version'      => $d['Version_Storage_Device']  ?? $d['version'] ?? null,
+                        'synced_at'    => now(),
+                    ]
+                );
+                $synced++;
+            }
+        }
+
+        // ── Server SMART ───────────────────────────────────────────────────
+        if ($request->has('server_smarts')) {
+            foreach ($request->input('server_smarts', []) as $d) {
+                $nocLocationId = $d['noc_location_id'] ?? null;
+                $nocScreenId   = $d['noc_screen_id']   ?? null;
+                if (!$nocLocationId || !$nocScreenId) continue;
+
+                $location = $this->resolveOrCreateLocation($noc, $nocLocationId, $d['location'] ?? []);
+                $screen   = $this->resolveOrCreateScreen($noc, $location, $nocScreenId, $d['screen'] ?? []);
+
+                HubServerSmart::updateOrCreate(
+                    ['noc_instance_id' => $noc->id, 'screen_id' => $screen->id],
+                    [
+                        'location_id'              => $location->id,
+                        'overall_health'           => $d['Overall_Health']            ?? $d['overall_health'] ?? null,
+                        'power_on_hours'           => $d['Power_On_Hours']            ?? $d['power_on_hours'] ?? null,
+                        'raw_read_error'           => $d['Raw_Read_Error']            ?? $d['raw_read_error'] ?? null,
+                        'reallocated_event'        => $d['Reallocated_Event']         ?? $d['reallocated_event'] ?? null,
+                        'reallocated_sector_count' => $d['Reallocated_Sector_Count']  ?? $d['reallocated_sector_count'] ?? null,
+                        'smart_support'            => $d['SMART_Support']             ?? $d['smart_support'] ?? null,
+                        'scan_date'                => $d['Scan_Date']                 ?? $d['scan_date'] ?? null,
+                        'seek_error_rate'          => $d['Seek_Error_Rate']           ?? $d['seek_error_rate'] ?? null,
+                        'temperature'              => $d['Temperature']               ?? $d['temperature'] ?? null,
+                        'udma_error'               => $d['UDMA_Error']               ?? $d['udma_error'] ?? null,
+                        'synced_at'                => now(),
+                    ]
+                );
+                $synced++;
+            }
+        }
+
+        // ── Light histories ────────────────────────────────────────────────
+        if ($request->has('light_histories')) {
+            foreach ($request->input('light_histories', []) as $d) {
+                $nocLocationId = $d['noc_location_id'] ?? null;
+                $nocScreenId   = $d['noc_screen_id']   ?? null;
+                if (!$nocLocationId || !$nocScreenId) continue;
+
+                $location = $this->resolveOrCreateLocation($noc, $nocLocationId, $d['location'] ?? []);
+                $screen   = $this->resolveOrCreateScreen($noc, $location, $nocScreenId, $d['screen'] ?? []);
+
+                HubLightHistory::updateOrCreate(
+                    ['noc_instance_id' => $noc->id, 'screen_id' => $screen->id, 'index_lamp' => $d['Index_lamp'] ?? $d['index_lamp'] ?? null],
+                    [
+                        'location_id'   => $location->id,
+                        'hours'         => $d['Hours']          ?? $d['hours'] ?? null,
+                        'power_range'   => $d['Power_Range']    ?? $d['power_range'] ?? null,
+                        'rotation_state'=> $d['Rotation_State'] ?? $d['rotation_state'] ?? null,
+                        'serial_number' => $d['Serial_Number']  ?? $d['serial_number'] ?? null,
+                        'type'          => $d['Type']           ?? $d['type'] ?? null,
+                        'date_lamp'     => $d['Date_lamp']      ?? $d['date_lamp'] ?? null,
+                        'synced_at'     => now(),
+                    ]
+                );
+                $synced++;
+            }
+        }
+
+        $noc->update(['last_sync_at' => now(), 'sync_status' => 'online']);
+        HubSyncLog::create(['noc_instance_id' => $noc->id, 'sync_type' => 'playback_details', 'status' => 'success', 'records_synced' => $synced, 'started_at' => $started, 'completed_at' => now()]);
+
+        return response()->json(['message' => "{$synced} detail record(s) synced.", 'synced' => $synced]);
     }
 
     // ── Errors ────────────────────────────────────────────────────────────────

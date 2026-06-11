@@ -83,7 +83,11 @@
                     $btnColor  = $isOffline ? 'bg-gray-200 text-gray-500'
                         : (($pb->security_manager !== 'Normal' || !$pb->soap_session) ? 'bg-red-500 text-white' : 'bg-green-500 text-white');
                 @endphp
-                <div class="rounded-xl border border-gray-200 bg-white p-3 flex flex-col gap-2">
+                <div class="screen-card rounded-xl border border-gray-200 bg-white p-3 flex flex-col gap-2"
+                     data-id="{{ $pb->id }}"
+                     data-name="{{ $pb->screen?->screen_name ?? 'Screen' }}"
+                     style="cursor:pointer">
+
                     {{-- Screen name --}}
                     <div class="rounded-lg px-2 py-1 text-center text-xs font-semibold {{ $btnColor }} truncate">
                         {{ $pb->screen?->screen_name ?? 'Screen' }}
@@ -91,7 +95,6 @@
 
                     {{-- Row 1: Playback + Projector + Lamp + Dowser --}}
                     <div class="flex justify-center gap-1 text-lg">
-                        {{-- Playback --}}
                         @if($isOffline)
                             <span title="Offline" class="text-gray-300">?</span>
                         @elseif($pb->playback_status === 'Play')
@@ -104,7 +107,6 @@
                             <span title="Unknown" class="text-amber-400">?</span>
                         @endif
 
-                        {{-- Projector --}}
                         @if($isOffline || !$pb->projector_status)
                             <span title="Projector off" class="text-gray-300">📽</span>
                         @elseif($pb->projector_lamp_stat === 'Normal')
@@ -113,14 +115,12 @@
                             <span title="Projector warning" class="text-amber-500">📽</span>
                         @endif
 
-                        {{-- Lamp --}}
                         @if(!$isOffline && $pb->lamp_status === 'On')
                             <span title="Lamp on" class="text-green-500">💡</span>
                         @else
                             <span title="Lamp off" class="text-gray-300">💡</span>
                         @endif
 
-                        {{-- Dowser --}}
                         @if(!$isOffline && $pb->dowser_status === 'Open')
                             <span title="Dowser open" class="text-green-500">○</span>
                         @else
@@ -130,14 +130,12 @@
 
                     {{-- Row 2: Monitor + Storage + Schedule + Sound --}}
                     <div class="flex justify-center gap-1 text-lg">
-                        {{-- Monitor --}}
                         @if(!$isOffline && $pb->ip_management_server_status !== 'Offline' && $pb->soap_session)
                             <span title="Server online" class="text-green-500">🖥</span>
                         @else
                             <span title="Server offline" class="text-gray-300">🖥</span>
                         @endif
 
-                        {{-- Storage --}}
                         @php $sg = $pb->storage_generale_status; @endphp
                         @if($sg === 'Normal')
                             <span title="Storage OK" class="text-green-500">🗄</span>
@@ -149,14 +147,12 @@
                             <span title="Storage unknown" class="text-gray-300">🗄</span>
                         @endif
 
-                        {{-- Schedule --}}
                         @if(!$isOffline && $pb->schedule_mode === 'Running')
                             <span title="Schedule running" class="text-green-500">📅</span>
                         @else
                             <span title="Schedule stopped" class="text-gray-300">📅</span>
                         @endif
 
-                        {{-- Sound --}}
                         @if(!$isOffline && $pb->ip_sound_status == 1 && $pb->mute_status === 'Unmuted')
                             <span title="Sound OK" class="text-green-500">🔊</span>
                         @elseif(!$isOffline && $pb->ip_sound_status == 1)
@@ -197,11 +193,288 @@
     </div>
 @endforelse
 
+{{-- ── Detail Modal ─────────────────────────────────────────────────────────── --}}
+<div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+    <div class="relative w-full max-w-3xl rounded-2xl bg-white shadow-2xl flex flex-col max-h-[90vh]">
+
+        {{-- Modal header --}}
+        <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4 shrink-0">
+            <h3 class="text-base font-bold text-gray-900" id="modal-title">Screen Detail</h3>
+            <button onclick="closeDetail()" class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        {{-- Tabs --}}
+        <div class="flex gap-1 border-b border-gray-200 px-6 shrink-0">
+            @foreach(['playback' => '▶ Playback', 'server' => '🖥 Server', 'projector' => '📽 Projector', 'sound' => '🔊 Sound'] as $tab => $label)
+                <button onclick="switchTab('{{ $tab }}')"
+                        id="tab-{{ $tab }}"
+                        class="tab-btn px-4 py-2.5 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-800 -mb-px transition-colors">
+                    {{ $label }}
+                </button>
+            @endforeach
+        </div>
+
+        {{-- Loading --}}
+        <div id="modal-loading" class="flex items-center justify-center py-16">
+            <svg class="h-6 w-6 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+        </div>
+
+        {{-- Tab content --}}
+        <div id="modal-content" class="hidden overflow-y-auto px-6 py-4 flex-1">
+
+            {{-- Playback tab --}}
+            <div id="tab-content-playback" class="tab-content space-y-4">
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Status</p><p class="mt-0.5 font-semibold text-sm" id="d-playback-status">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">SPL Title</p><p class="mt-0.5 font-semibold text-sm truncate" id="d-spl-title">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">CPL Title</p><p class="mt-0.5 font-semibold text-sm truncate" id="d-cpl-title">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Elapsed</p><p class="mt-0.5 font-semibold text-sm" id="d-elapsed">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Remaining</p><p class="mt-0.5 font-semibold text-sm" id="d-remaining">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Progress</p><p class="mt-0.5 font-semibold text-sm" id="d-progress">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Projector</p><p class="mt-0.5 font-semibold text-sm" id="d-projector">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Lamp</p><p class="mt-0.5 font-semibold text-sm" id="d-lamp">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Dowser</p><p class="mt-0.5 font-semibold text-sm" id="d-dowser">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Sound Model</p><p class="mt-0.5 font-semibold text-sm" id="d-sound-model">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Mute</p><p class="mt-0.5 font-semibold text-sm" id="d-mute">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Format</p><p class="mt-0.5 font-semibold text-sm" id="d-format">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Security Manager</p><p class="mt-0.5 font-semibold text-sm" id="d-security">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Schedule Mode</p><p class="mt-0.5 font-semibold text-sm" id="d-schedule">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Storage</p><p class="mt-0.5 font-semibold text-sm" id="d-storage">—</p></div>
+                </div>
+            </div>
+
+            {{-- Server tab --}}
+            <div id="tab-content-server" class="tab-content hidden space-y-4">
+                <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider">Server Info</h4>
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Serial Number</p><p class="mt-0.5 font-semibold text-sm" id="d-serial">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Software</p><p class="mt-0.5 font-semibold text-sm" id="d-software">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Firmware</p><p class="mt-0.5 font-semibold text-sm" id="d-firmware">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Bundle</p><p class="mt-0.5 font-semibold text-sm" id="d-bundle">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Certificate Date</p><p class="mt-0.5 font-semibold text-sm" id="d-cert">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Show Title</p><p class="mt-0.5 font-semibold text-sm" id="d-show-title">—</p></div>
+                </div>
+
+                <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider mt-4">Storage Devices</h4>
+                <div id="d-storage-devices" class="space-y-2"></div>
+
+                <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider mt-4">SMART Data</h4>
+                <div id="d-smarts" class="space-y-2"></div>
+            </div>
+
+            {{-- Projector tab --}}
+            <div id="tab-content-projector" class="tab-content hidden space-y-4">
+                <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider">Projector Info</h4>
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Model</p><p class="mt-0.5 font-semibold text-sm" id="d-proj-model">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Serial Number</p><p class="mt-0.5 font-semibold text-sm" id="d-proj-serial">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Manufacture Date</p><p class="mt-0.5 font-semibold text-sm" id="d-proj-date">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Software</p><p class="mt-0.5 font-semibold text-sm" id="d-proj-sw">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Operating Hours</p><p class="mt-0.5 font-semibold text-sm" id="d-proj-hours">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Power Status</p><p class="mt-0.5 font-semibold text-sm" id="d-proj-power">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Shutter</p><p class="mt-0.5 font-semibold text-sm" id="d-proj-shutter">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Light Status</p><p class="mt-0.5 font-semibold text-sm" id="d-proj-light">—</p></div>
+                </div>
+
+                <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider mt-4">Lamp</h4>
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Model</p><p class="mt-0.5 font-semibold text-sm" id="d-lamp-model">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Serial</p><p class="mt-0.5 font-semibold text-sm" id="d-lamp-serial">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Hours</p><p class="mt-0.5 font-semibold text-sm" id="d-lamp-hours">—</p></div>
+                </div>
+
+                <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider mt-4">Lamp History</h4>
+                <div id="d-lamp-histories" class="space-y-2"></div>
+            </div>
+
+            {{-- Sound tab --}}
+            <div id="tab-content-sound" class="tab-content hidden space-y-4">
+                <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider">Sound System Info</h4>
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Model</p><p class="mt-0.5 font-semibold text-sm" id="d-snd-model">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Serial Number</p><p class="mt-0.5 font-semibold text-sm" id="d-snd-serial">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">CAT-1700 Serial</p><p class="mt-0.5 font-semibold text-sm" id="d-snd-cat">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Software</p><p class="mt-0.5 font-semibold text-sm" id="d-snd-sw">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Bypass</p><p class="mt-0.5 font-semibold text-sm" id="d-snd-bypass">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Power Supply</p><p class="mt-0.5 font-semibold text-sm" id="d-snd-power">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">AES Status</p><p class="mt-0.5 font-semibold text-sm" id="d-snd-aes">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Alert</p><p class="mt-0.5 font-semibold text-sm" id="d-snd-alert">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Fader</p><p class="mt-0.5 font-semibold text-sm" id="d-snd-fader">—</p></div>
+                    <div class="rounded-lg bg-gray-50 p-3"><p class="text-xs text-gray-500">Bit Stream</p><p class="mt-0.5 font-semibold text-sm" id="d-snd-bitstream">—</p></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script>
-    // Auto-refresh every 30 seconds
-    setTimeout(() => location.reload(), 30000);
+    // Auto-refresh every 30 seconds (only if modal is closed)
+    setTimeout(() => { if (modal.classList.contains('hidden')) location.reload(); }, 30000);
+
+    // Click handler on screen cards
+    document.querySelectorAll('.screen-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+            openDetail(this.dataset.id, this.dataset.name);
+        });
+    });
+
+    const modal      = document.getElementById('detail-modal');
+    const loading    = document.getElementById('modal-loading');
+    const content    = document.getElementById('modal-content');
+    const detailBase = '{{ url('admin/playback') }}';
+    let activeTab    = 'playback';
+
+    function v(val) { return val ?? '—'; }
+
+    function openDetail(id, screenName) {
+        document.getElementById('modal-title').textContent = screenName;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        loading.classList.remove('hidden');
+        content.classList.add('hidden');
+        switchTab('playback');
+
+        fetch(`${detailBase}/${id}/detail`)
+            .then(r => r.json())
+            .then(data => {
+                fillPlayback(data.playback);
+                fillServer(data.server_detail, data.storage_devices, data.server_smarts);
+                fillProjector(data.projector_detail, data.light_histories);
+                fillSound(data.sound_detail, data.playback);
+                loading.classList.add('hidden');
+                content.classList.remove('hidden');
+            })
+            .catch(() => {
+                loading.innerHTML = '<p class="text-sm text-red-500">Failed to load data.</p>';
+            });
+    }
+
+    function closeDetail() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function switchTab(tab) {
+        activeTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('border-blue-500', 'text-blue-600');
+            b.classList.add('border-transparent', 'text-gray-500');
+        });
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.getElementById('tab-' + tab).classList.add('border-blue-500', 'text-blue-600');
+        document.getElementById('tab-' + tab).classList.remove('border-transparent', 'text-gray-500');
+        document.getElementById('tab-content-' + tab).classList.remove('hidden');
+    }
+
+    function set(id, val) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = v(val);
+    }
+
+    function fillPlayback(pb) {
+        set('d-playback-status', pb.playback_status);
+        set('d-spl-title',       pb.spl_title);
+        set('d-cpl-title',       pb.cpl_title);
+        set('d-elapsed',         pb.elapsed_runtime);
+        set('d-remaining',       pb.remaining_runtime);
+        set('d-progress',        pb.progress_bar !== null ? pb.progress_bar + '%' : null);
+        set('d-projector',       pb.projector_lamp_stat);
+        set('d-lamp',            pb.lamp_status);
+        set('d-dowser',          pb.dowser_status);
+        set('d-sound-model',     pb.sound_model);
+        set('d-mute',            pb.mute_status);
+        set('d-format',          pb.format_status);
+        set('d-security',        pb.security_manager);
+        set('d-schedule',        pb.schedule_mode);
+        set('d-storage',         pb.storage_generale_status);
+    }
+
+    function fillServer(sd, devices, smarts) {
+        set('d-serial',     sd?.serial_number);
+        set('d-software',   sd?.main_software_version);
+        set('d-firmware',   sd?.main_firmware_version);
+        set('d-bundle',     sd?.bundle_version);
+        set('d-cert',       sd?.certificat_date);
+        set('d-show-title', sd?.show_title);
+
+        const devEl = document.getElementById('d-storage-devices');
+        devEl.innerHTML = devices && devices.length ? devices.map(d =>
+            `<div class="rounded-lg border border-gray-200 px-3 py-2 text-xs grid grid-cols-3 gap-2">
+                <span><span class="text-gray-400">Model:</span> ${v(d.model)}</span>
+                <span><span class="text-gray-400">Serial:</span> ${v(d.serial_number)}</span>
+                <span><span class="text-gray-400">State:</span> ${v(d.working_state)}</span>
+                <span><span class="text-gray-400">Bus:</span> ${v(d.bus)}</span>
+                <span><span class="text-gray-400">Capacity:</span> ${v(d.capacity)}</span>
+                <span><span class="text-gray-400">Type:</span> ${v(d.type)}</span>
+            </div>`
+        ).join('') : '<p class="text-xs text-gray-400">No storage data</p>';
+
+        const smartEl = document.getElementById('d-smarts');
+        smartEl.innerHTML = smarts && smarts.length ? smarts.map(s =>
+            `<div class="rounded-lg border border-gray-200 px-3 py-2 text-xs grid grid-cols-3 gap-2">
+                <span><span class="text-gray-400">Health:</span> ${v(s.overall_health)}</span>
+                <span><span class="text-gray-400">Power Hours:</span> ${v(s.power_on_hours)}</span>
+                <span><span class="text-gray-400">Temperature:</span> ${v(s.temperature)}</span>
+                <span><span class="text-gray-400">SMART:</span> ${v(s.smart_support)}</span>
+                <span><span class="text-gray-400">Scan Date:</span> ${v(s.scan_date)}</span>
+                <span><span class="text-gray-400">UDMA Error:</span> ${v(s.udma_error)}</span>
+            </div>`
+        ).join('') : '<p class="text-xs text-gray-400">No SMART data</p>';
+    }
+
+    function fillProjector(pd, lamps) {
+        set('d-proj-model',   pd?.system_model);
+        set('d-proj-serial',  pd?.system_serial_number);
+        set('d-proj-date',    pd?.system_manufacture_date);
+        set('d-proj-sw',      pd?.system_software_version);
+        set('d-proj-hours',   pd?.operating_hours);
+        set('d-proj-power',   pd?.power_status);
+        set('d-proj-shutter', pd?.shutter_status);
+        set('d-proj-light',   pd?.light_status);
+        set('d-lamp-model',   pd?.light_model);
+        set('d-lamp-serial',  pd?.light_serial);
+        set('d-lamp-hours',   pd?.light_hours);
+
+        const lampEl = document.getElementById('d-lamp-histories');
+        lampEl.innerHTML = lamps && lamps.length ? lamps.map(l =>
+            `<div class="rounded-lg border border-gray-200 px-3 py-2 text-xs grid grid-cols-3 gap-2">
+                <span><span class="text-gray-400">Index:</span> ${v(l.index_lamp)}</span>
+                <span><span class="text-gray-400">Serial:</span> ${v(l.serial_number)}</span>
+                <span><span class="text-gray-400">Hours:</span> ${v(l.hours)}</span>
+                <span><span class="text-gray-400">Date:</span> ${v(l.date_lamp)}</span>
+                <span><span class="text-gray-400">Type:</span> ${v(l.type)}</span>
+                <span><span class="text-gray-400">Power Range:</span> ${v(l.power_range)}</span>
+            </div>`
+        ).join('') : '<p class="text-xs text-gray-400">No lamp history</p>';
+    }
+
+    function fillSound(sd, pb) {
+        set('d-snd-model',      sd?.model);
+        set('d-snd-serial',     sd?.serial_number);
+        set('d-snd-cat',        sd?.cat1700_serial_number);
+        set('d-snd-sw',         sd?.software);
+        set('d-snd-bypass',     sd?.bypass);
+        set('d-snd-power',      sd?.power_supply);
+        set('d-snd-aes',        sd?.aes_status);
+        set('d-snd-alert',      sd?.alert);
+        set('d-snd-fader',      pb?.fader_status);
+        set('d-snd-bitstream',  pb?.bit_stream);
+    }
+
+    // Close modal on backdrop click
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeDetail();
+    });
 </script>
 @endpush

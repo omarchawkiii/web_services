@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\HubAuthController;
 use App\Http\Controllers\Api\HubErrorController;
 use App\Http\Controllers\Api\HubPlaybackController;
+use App\Http\Controllers\Api\HubPlaybackDetailController;
 use App\Http\Controllers\Api\HubScheduleController;
 use App\Http\Controllers\Api\NocSyncController;
 use Illuminate\Support\Facades\Route;
@@ -17,9 +18,10 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('noc')->group(function () {
     Route::post('/locations/sync', [NocSyncController::class, 'syncLocations']);
     Route::post('/users/sync',     [NocSyncController::class, 'syncUsers']);
-    Route::post('/playback/sync',  [NocSyncController::class, 'syncPlayback']);
-    Route::post('/schedules/sync', [NocSyncController::class, 'syncSchedules']);
-    Route::post('/errors/sync',    [NocSyncController::class, 'syncErrors']);
+    Route::post('/playback/sync',         [NocSyncController::class, 'syncPlayback']);
+    Route::post('/playback-details/sync', [NocSyncController::class, 'syncPlaybackDetails']);
+    Route::post('/schedules/sync',        [NocSyncController::class, 'syncSchedules']);
+    Route::post('/errors/sync',           [NocSyncController::class, 'syncErrors']);
 });
 
 /*
@@ -42,8 +44,11 @@ Route::prefix('hub/mobile')->name('hub.mobile.')->group(function () {
 
         // Playback
         Route::prefix('playback')->name('playback.')->group(function () {
-            Route::get('/',      [HubPlaybackController::class, 'index'])->name('index');
-            Route::get('/{id}',  [HubPlaybackController::class, 'show'])->name('show');
+            Route::get('/',                [HubPlaybackController::class,       'index'])->name('index');
+            Route::get('/{id}',            [HubPlaybackController::class,       'show'])->name('show');
+            Route::get('/{id}/server',     [HubPlaybackDetailController::class, 'serverDetail'])->name('server');
+            Route::get('/{id}/projector',  [HubPlaybackDetailController::class, 'projectorDetail'])->name('projector');
+            Route::get('/{id}/sound',      [HubPlaybackDetailController::class, 'soundDetail'])->name('sound');
         });
 
         // Schedules

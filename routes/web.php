@@ -22,7 +22,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // ── Hub Data ─────────────────────────────────────────────────────────────
-    Route::get('/playback',  [HubPlaybackController::class,      'index'])->name('hub-playback.index');
+    Route::get('/playback',          [HubPlaybackController::class, 'index'])->name('hub-playback.index');
+    Route::get('/playback/{id}/detail', [HubPlaybackController::class, 'detail'])->name('hub-playback.detail');
     Route::get('/schedules', [HubScheduleAdminController::class, 'index'])->name('hub-schedules.index');
     Route::get('/errors',    [HubErrorAdminController::class,    'index'])->name('hub-errors.index');
     Route::get('/sync-logs', [SyncLogController::class,          'index'])->name('sync-logs.index');
