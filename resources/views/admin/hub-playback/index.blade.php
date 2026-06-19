@@ -408,15 +408,23 @@
         set('d-cert',       sd?.certificat_date);
         set('d-show-title', sd?.show_title);
 
+        const busLabels   = {1:'Unknown',2:'IDE',3:'USB',4:'SATA',5:'SAS',6:'Firewire'};
+        const typeLabels  = {1:'Unknown',2:'CF',3:'SSD',4:'HDD'};
+        const stateLabels = {1:'Undefined',2:'Not Applicable',3:'Normal',4:'Warning',5:'Error'};
+        const decodeEnum  = (map, val) => val != null ? (map[val] ?? val) + ' (' + val + ')' : '—';
+
         const devEl = document.getElementById('d-storage-devices');
         devEl.innerHTML = devices && devices.length ? devices.map(d =>
             `<div class="rounded-lg border border-gray-200 px-3 py-2 text-xs grid grid-cols-3 gap-2">
                 <span><span class="text-gray-400">Model:</span> ${v(d.model)}</span>
                 <span><span class="text-gray-400">Serial:</span> ${v(d.serial_number)}</span>
-                <span><span class="text-gray-400">State:</span> ${v(d.working_state)}</span>
-                <span><span class="text-gray-400">Bus:</span> ${v(d.bus)}</span>
+                <span><span class="text-gray-400">State:</span> ${decodeEnum(stateLabels, d.working_state)}</span>
+                <span><span class="text-gray-400">Bus:</span> ${decodeEnum(busLabels, d.bus)}</span>
                 <span><span class="text-gray-400">Capacity:</span> ${v(d.capacity)}</span>
-                <span><span class="text-gray-400">Type:</span> ${v(d.type)}</span>
+                <span><span class="text-gray-400">Type:</span> ${decodeEnum(typeLabels, d.type)}</span>
+                <span><span class="text-gray-400">Index:</span> ${v(d.index_storage)}</span>
+                <span><span class="text-gray-400">Title:</span> ${v(d.title)}</span>
+                <span><span class="text-gray-400">Version:</span> ${v(d.version)}</span>
             </div>`
         ).join('') : '<p class="text-xs text-gray-400">No storage data</p>';
 

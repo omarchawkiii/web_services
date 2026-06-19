@@ -647,11 +647,25 @@ class NocSyncController extends Controller
 
         // ── Storage errors ─────────────────────────────────────────────────
         if ($request->has('storage_errors')) {
-            HubStorageError::where('noc_instance_id', $noc->id)->delete();
+            $syncedStorageKeys = [];
             foreach ($request->input('storage_errors', []) as $e) {
-                $loc = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
-                HubStorageError::create(['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'server_name' => $e['serverName'] ?? $e['server_name'] ?? null, 'synced_at' => now()]);
+                $loc        = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
+                $serverName = $e['serverName'] ?? $e['server_name'] ?? null;
+                HubStorageError::updateOrCreate(
+                    ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'server_name' => $serverName],
+                    ['synced_at' => now()]
+                );
+                $syncedStorageKeys[] = [$loc->id, $serverName];
                 $synced++;
+            }
+            if (!empty($syncedStorageKeys)) {
+                $placeholders = implode(',', array_fill(0, count($syncedStorageKeys), '(?,?)'));
+                $bindings     = array_merge(...array_map(fn($k) => $k, $syncedStorageKeys));
+                HubStorageError::where('noc_instance_id', $noc->id)
+                    ->whereRaw("(location_id, server_name) NOT IN ({$placeholders})", $bindings)
+                    ->delete();
+            } else {
+                HubStorageError::where('noc_instance_id', $noc->id)->delete();
             }
         }
 
