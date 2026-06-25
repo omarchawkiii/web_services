@@ -862,14 +862,17 @@
         <table>
           <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td class="field-name">index_storage</td><td class="field-type">integer|null</td><td>Storage device index</td></tr>
-            <tr><td class="field-name">bus</td><td class="field-type">string|null</td><td>Bus type (SATA, SAS, NVMe…)</td></tr>
-            <tr><td class="field-name">capacity</td><td class="field-type">string|null</td><td>Disk capacity</td></tr>
-            <tr><td class="field-name">model</td><td class="field-type">string|null</td><td>Disk model</td></tr>
+            <tr><td class="field-name">index_storage</td><td class="field-type">integer|null</td><td>Storage device index (SNMP Counter32)</td></tr>
+            <tr><td class="field-name">bus</td><td class="field-type">integer|null</td><td>Bus type — raw SNMP integer: 1=Unknown, 2=IDE, 3=USB, 4=SATA, 5=SAS, 6=Firewire</td></tr>
+            <tr><td class="field-name">bus_label</td><td class="field-type">string|null</td><td>Human-readable bus type decoded from <code>bus</code> (e.g. <code>"USB"</code>, <code>"SATA"</code>)</td></tr>
+            <tr><td class="field-name">capacity</td><td class="field-type">string|null</td><td>Disk capacity (MB)</td></tr>
+            <tr><td class="field-name">model</td><td class="field-type">string|null</td><td>Disk model name</td></tr>
             <tr><td class="field-name">serial_number</td><td class="field-type">string|null</td><td>Disk serial number</td></tr>
-            <tr><td class="field-name">working_state</td><td class="field-type">string|null</td><td>Disk health state</td></tr>
-            <tr><td class="field-name">title</td><td class="field-type">string|null</td><td>Disk label / title</td></tr>
-            <tr><td class="field-name">type</td><td class="field-type">string|null</td><td>Disk type (SSD, HDD…)</td></tr>
+            <tr><td class="field-name">working_state</td><td class="field-type">integer|null</td><td>Disk health state — raw SNMP integer: 1=Undefined, 2=Not Applicable, 3=Normal, 4=Warning, 5=Error</td></tr>
+            <tr><td class="field-name">working_state_label</td><td class="field-type">string|null</td><td>Human-readable health state decoded from <code>working_state</code> (e.g. <code>"Normal"</code>, <code>"Warning"</code>)</td></tr>
+            <tr><td class="field-name">title</td><td class="field-type">string|null</td><td>Disk mount label / title (e.g. <code>"sdg"</code>)</td></tr>
+            <tr><td class="field-name">type</td><td class="field-type">integer|null</td><td>Disk type — raw SNMP integer: 1=Unknown, 2=CF, 3=SSD, 4=HDD</td></tr>
+            <tr><td class="field-name">type_label</td><td class="field-type">string|null</td><td>Human-readable disk type decoded from <code>type</code> (e.g. <code>"SSD"</code>, <code>"HDD"</code>)</td></tr>
             <tr><td class="field-name">version</td><td class="field-type">string|null</td><td>Storage device firmware version</td></tr>
           </tbody>
         </table>
@@ -905,12 +908,18 @@
   },
   <span class="json-key">"storage_devices"</span>: [
     {
-      <span class="json-key">"index_storage"</span>: <span class="json-num">0</span>,
-      <span class="json-key">"bus"</span>: <span class="json-str">"SATA"</span>,
-      <span class="json-key">"capacity"</span>: <span class="json-str">"4TB"</span>,
-      <span class="json-key">"model"</span>: <span class="json-str">"WDC WD4000FYYZ"</span>,
-      <span class="json-key">"working_state"</span>: <span class="json-str">"Online"</span>,
-      <span class="json-key">"type"</span>: <span class="json-str">"HDD"</span>
+      <span class="json-key">"index_storage"</span>: <span class="json-num">1</span>,
+      <span class="json-key">"bus"</span>: <span class="json-num">3</span>,
+      <span class="json-key">"bus_label"</span>: <span class="json-str">"USB"</span>,
+      <span class="json-key">"capacity"</span>: <span class="json-num">1960</span>,
+      <span class="json-key">"model"</span>: <span class="json-str">"USB EDC InnoDisk"</span>,
+      <span class="json-key">"serial_number"</span>: <span class="json-str">"20120425AA5U00000976"</span>,
+      <span class="json-key">"working_state"</span>: <span class="json-num">3</span>,
+      <span class="json-key">"working_state_label"</span>: <span class="json-str">"Normal"</span>,
+      <span class="json-key">"title"</span>: <span class="json-str">"sdg"</span>,
+      <span class="json-key">"type"</span>: <span class="json-num">3</span>,
+      <span class="json-key">"type_label"</span>: <span class="json-str">"SSD"</span>,
+      <span class="json-key">"version"</span>: <span class="json-str">"0910"</span>
     }
   ],
   <span class="json-key">"server_smarts"</span>: [
