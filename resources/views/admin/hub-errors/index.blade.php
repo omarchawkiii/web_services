@@ -14,6 +14,7 @@
         ['label' => 'Projector', 'value' => $totals['projector'],  'color' => 'amber'],
         ['label' => 'Sound',     'value' => $totals['sound'],      'color' => 'green'],
         ['label' => 'Storage',   'value' => $totals['storage'],    'color' => 'purple'],
+        ['label' => 'TMS',       'value' => $totals['tms'],        'color' => 'orange'],
     ];
     @endphp
     @foreach($cards as $card)
@@ -55,7 +56,7 @@
 
 {{-- Tabs --}}
 @php
-$tabs = ['summary','kdm','server','projector','sound','storage','raid','alarms'];
+$tabs = ['summary','kdm','server','projector','sound','storage','raid','alarms','tms'];
 @endphp
 <div class="mb-4 flex flex-wrap gap-2">
     @foreach($tabs as $t)
@@ -80,6 +81,7 @@ $tabs = ['summary','kdm','server','projector','sound','storage','raid','alarms']
                     <th class="px-5 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Projector</th>
                     <th class="px-5 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Sound</th>
                     <th class="px-5 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Storage</th>
+                    <th class="px-5 py-3 text-center text-xs font-semibold text-gray-500 uppercase">TMS</th>
                     <th class="px-5 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Synced</th>
                 </tr>
             </thead>
@@ -88,7 +90,7 @@ $tabs = ['summary','kdm','server','projector','sound','storage','raid','alarms']
                     <tr class="hover:bg-gray-50">
                         <td class="px-5 py-3"><span class="inline-flex rounded-md bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700">{{ $s->nocInstance?->name }}</span></td>
                         <td class="px-5 py-3 text-sm text-gray-700">{{ $s->location?->name }}</td>
-                        @foreach(['kdm_errors','nbr_server_alert','nbr_projector_alert','nbr_sound_alert','nbr_storage_errors'] as $field)
+                        @foreach(['kdm_errors','nbr_server_alert','nbr_projector_alert','nbr_sound_alert','nbr_storage_errors','nbr_tms_alert'] as $field)
                             <td class="px-5 py-3 text-center text-sm font-semibold {{ $s->$field > 0 ? 'text-red-600' : 'text-gray-300' }}">
                                 {{ $s->$field }}
                             </td>
@@ -96,7 +98,7 @@ $tabs = ['summary','kdm','server','projector','sound','storage','raid','alarms']
                         <td class="px-5 py-3 text-xs text-gray-400 text-center">{{ $s->synced_at?->diffForHumans() ?? '—' }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="8" class="px-5 py-10 text-center text-sm text-gray-400">No data</td></tr>
+                    <tr><td colspan="9" class="px-5 py-10 text-center text-sm text-gray-400">No data</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -133,6 +135,13 @@ $tabs = ['summary','kdm','server','projector','sound','storage','raid','alarms']
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Screen</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">State</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Title</th>
+                    @elseif($tab === 'tms')
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Title</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Severity</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Code</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Server</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Device</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Message</th>
                     @endif
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Synced</th>
                 </tr>
@@ -167,6 +176,15 @@ $tabs = ['summary','kdm','server','projector','sound','storage','raid','alarms']
                             <td class="px-4 py-3 text-sm text-gray-600">{{ $row->screen?->screen_name ?? '—' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ $row->alarm_working_state ?? '—' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $row->title ?? '—' }}</td>
+                        @elseif($tab === 'tms')
+                            <td class="px-4 py-3 text-sm text-gray-700">{{ $row->title ?? '—' }}</td>
+                            <td class="px-4 py-3"><span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium
+                                {{ strtolower($row->severity ?? '') === 'critical' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700' }}">
+                                {{ $row->severity ?? '—' }}</span></td>
+                            <td class="px-4 py-3 text-xs font-mono text-gray-500">{{ $row->code ?? '—' }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">{{ $row->server_name ?? '—' }}</td>
+                            <td class="px-4 py-3 text-xs text-gray-500">{{ $row->device_sub_type ?? '—' }}</td>
+                            <td class="px-4 py-3 text-xs text-gray-500 max-w-xs truncate">{{ $row->message ?? '—' }}</td>
                         @endif
                         <td class="px-4 py-3 text-xs text-gray-400">{{ $row->synced_at?->diffForHumans() ?? '—' }}</td>
                     </tr>

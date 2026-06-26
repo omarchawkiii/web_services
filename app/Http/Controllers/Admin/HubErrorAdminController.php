@@ -10,6 +10,7 @@ use App\Models\HubServerAlarm;
 use App\Models\HubServerError;
 use App\Models\HubSoundError;
 use App\Models\HubStorageError;
+use App\Models\HubTmsError;
 use App\Models\NocInstance;
 use App\Models\Location;
 use Illuminate\Http\Request;
@@ -37,6 +38,7 @@ class HubErrorAdminController extends Controller
             'projector' => $summaries->sum('nbr_projector_alert'),
             'server'    => $summaries->sum('nbr_server_alert'),
             'storage'   => $summaries->sum('nbr_storage_errors'),
+            'tms'       => $summaries->sum('nbr_tms_alert'),
         ];
         $totals['total'] = array_sum($totals);
 
@@ -53,6 +55,7 @@ class HubErrorAdminController extends Controller
             'storage'  => $filter(HubStorageError::query())->get(),
             'raid'     => $filter(HubRaidAlert::query())->get(),
             'alarms'   => $filter(HubServerAlarm::query())->with('screen')->get(),
+            'tms'      => $filter(HubTmsError::query())->get(),
             default    => collect(),
         };
 
