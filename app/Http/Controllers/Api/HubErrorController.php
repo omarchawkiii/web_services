@@ -10,6 +10,7 @@ use App\Models\HubServerAlarm;
 use App\Models\HubServerError;
 use App\Models\HubSoundError;
 use App\Models\HubStorageError;
+use App\Models\HubTmsError;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -25,17 +26,18 @@ class HubErrorController extends Controller
         $locationIds = $this->userLocationIds($request);
         $rows = HubErrorSummary::whereIn('location_id', $locationIds)->get();
 
-        $kdm_errors = $nbr_sound_alert = $nbr_projector_alert = $nbr_server_alert = $nbr_storage_errors = 0;
+        $kdm_errors = $nbr_sound_alert = $nbr_projector_alert = $nbr_server_alert = $nbr_storage_errors = $nbr_tms_alert = 0;
         foreach ($rows as $r) {
             $kdm_errors          += $r->kdm_errors;
             $nbr_sound_alert     += $r->nbr_sound_alert;
             $nbr_projector_alert += $r->nbr_projector_alert;
             $nbr_server_alert    += $r->nbr_server_alert;
             $nbr_storage_errors  += $r->nbr_storage_errors;
+            $nbr_tms_alert       += $r->nbr_tms_alert ?? 0;
         }
-        $total_errors = $kdm_errors + $nbr_sound_alert + $nbr_projector_alert + $nbr_server_alert + $nbr_storage_errors;
+        $total_errors = $kdm_errors + $nbr_sound_alert + $nbr_projector_alert + $nbr_server_alert + $nbr_storage_errors + $nbr_tms_alert;
 
-        return response()->json(compact('kdm_errors','nbr_sound_alert','nbr_projector_alert','nbr_server_alert','nbr_storage_errors','total_errors'));
+        return response()->json(compact('kdm_errors','nbr_sound_alert','nbr_projector_alert','nbr_server_alert','nbr_storage_errors','nbr_tms_alert','total_errors'));
     }
 
     public function kdm(Request $request): JsonResponse
@@ -78,5 +80,11 @@ class HubErrorController extends Controller
     {
         $alarms = HubServerAlarm::with(['location','nocInstance','screen'])->whereIn('location_id', $this->userLocationIds($request))->get();
         return response()->json(compact('alarms'));
+    }
+
+    public function tms(Request $request): JsonResponse
+    {
+        $list = HubTmsError::with(['location','nocInstance'])->whereIn('location_id', $this->userLocationIds($request))->get();
+        return response()->json(['tms_errors_list' => $list]);
     }
 }

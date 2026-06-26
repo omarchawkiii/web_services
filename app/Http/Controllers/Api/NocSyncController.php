@@ -20,6 +20,7 @@ use App\Models\HubSoundDetail;
 use App\Models\HubSoundError;
 use App\Models\HubStorageDevice;
 use App\Models\HubStorageError;
+use App\Models\HubTmsError;
 use App\Models\HubSyncLog;
 use App\Models\Location;
 use App\Models\NocInstance;
@@ -561,6 +562,7 @@ class NocSyncController extends Controller
                     'nbr_projector_alert' => $s['nbr_projector_alert'] ?? 0,
                     'nbr_server_alert'    => $s['nbr_server_alert']    ?? 0,
                     'nbr_storage_errors'  => $s['nbr_storage_errors']  ?? 0,
+                    'nbr_tms_alert'       => $s['nbr_tms_alert']       ?? 0,
                     'synced_at'           => now(),
                 ]
             );
@@ -667,6 +669,46 @@ class NocSyncController extends Controller
             } else {
                 HubStorageError::where('noc_instance_id', $noc->id)->delete();
             }
+        }
+
+        // ── TMS errors ─────────────────────────────────────────────────────
+        if ($request->has('tms_errors')) {
+            $syncedTmsIds = [];
+            foreach ($request->input('tms_errors', []) as $e) {
+                $loc       = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
+                $idTmsError = $e['id_tms_error'] ?? null;
+                HubTmsError::updateOrCreate(
+                    ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'id_tms_error' => $idTmsError],
+                    [
+                        'title'                 => $e['title']                 ?? null,
+                        'code'                  => $e['code']                  ?? null,
+                        'severity'              => $e['severity']              ?? null,
+                        'message'               => $e['message']               ?? null,
+                        'time_saved'            => $e['time_saved']            ?? null,
+                        'id_screen'             => $e['id_screen']             ?? null,
+                        'ip_projector'          => $e['ip_projector']          ?? null,
+                        'display_message'       => $e['display_message']       ?? null,
+                        'recommended_action'    => $e['recommended_action']    ?? null,
+                        'device_sub_type'       => $e['device_sub_type']       ?? null,
+                        'device_sub_type_ip'    => $e['device_sub_type_ip']    ?? null,
+                        'device_sub_type_model' => $e['device_sub_type_model'] ?? null,
+                        'device_sub_type_title' => $e['device_sub_type_title'] ?? null,
+                        'server_name'           => $e['serverName']            ?? null,
+                        'screen_model'          => $e['screenModel']           ?? null,
+                        'projector_ip'          => $e['projector_ip']          ?? null,
+                        'sound_ip'              => $e['sound_ip']              ?? null,
+                        'number'                => $e['number']                ?? null,
+                        'projector_brand'       => $e['projector_brand']       ?? null,
+                        'projector_model'       => $e['projector_model']       ?? null,
+                        'sound_brand'           => $e['sound_brand']           ?? null,
+                        'sound_model'           => $e['sound_model']           ?? null,
+                        'synced_at'             => now(),
+                    ]
+                );
+                if ($idTmsError !== null) $syncedTmsIds[] = $idTmsError;
+                $synced++;
+            }
+            HubTmsError::where('noc_instance_id', $noc->id)->whereNotIn('id_tms_error', $syncedTmsIds)->delete();
         }
 
         // ── RAID alerts ────────────────────────────────────────────────────
