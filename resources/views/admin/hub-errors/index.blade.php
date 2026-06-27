@@ -114,21 +114,31 @@ $tabs = ['summary','kdm','server','projector','sound','storage','raid','alarms',
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">CPL ID</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Annotation</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Server</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Message</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Recommended Action</th>
                     @elseif($tab === 'server')
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Event ID</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Type</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Criticity</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Server</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Message</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Recommended Action</th>
                     @elseif($tab === 'projector')
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Title</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Severity</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Server</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Message</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Recommended Action</th>
                     @elseif($tab === 'sound')
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Title</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Severity</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Hardware</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Message</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Recommended Action</th>
                     @elseif($tab === 'storage')
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Server</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Message</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Recommended Action</th>
                     @elseif($tab === 'raid')
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Alerts</th>
                     @elseif($tab === 'alarms')
@@ -155,21 +165,31 @@ $tabs = ['summary','kdm','server','projector','sound','storage','raid','alarms',
                             <td class="px-4 py-3 text-xs font-mono text-gray-600 max-w-xs truncate">{{ $row->cpl_id ?? '—' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $row->annotation_text ?? '—' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ $row->server_name ?? '—' }}</td>
+                            <td class="px-4 py-3 text-xs text-gray-500 max-w-xs truncate">{{ $row->message ?? '—' }}</td>
+                            <td class="px-4 py-3 text-xs text-blue-600 max-w-xs truncate">{{ $row->recommended_action ?? '—' }}</td>
                         @elseif($tab === 'server')
                             <td class="px-4 py-3 text-sm text-gray-600">{{ $row->event_id ?? '—' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ $row->type ?? '—' }}</td>
                             <td class="px-4 py-3"><span class="inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-700">{{ $row->criticity ?? '—' }}</span></td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ $row->server_name ?? '—' }}</td>
+                            <td class="px-4 py-3 text-xs text-gray-500 max-w-xs truncate">{{ $row->message ?? '—' }}</td>
+                            <td class="px-4 py-3 text-xs text-blue-600 max-w-xs truncate">{{ $row->recommended_action ?? '—' }}</td>
                         @elseif($tab === 'projector')
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $row->title ?? '—' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ $row->severity ?? '—' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ $row->server_name ?? '—' }}</td>
+                            <td class="px-4 py-3 text-xs text-gray-500 max-w-xs truncate">{{ $row->message ?? '—' }}</td>
+                            <td class="px-4 py-3 text-xs text-blue-600 max-w-xs truncate">{{ $row->recommended_action ?? '—' }}</td>
                         @elseif($tab === 'sound')
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $row->title ?? '—' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ $row->severity ?? '—' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ $row->hardware ?? '—' }}</td>
+                            <td class="px-4 py-3 text-xs text-gray-500 max-w-xs truncate">{{ $row->message ?? '—' }}</td>
+                            <td class="px-4 py-3 text-xs text-blue-600 max-w-xs truncate">{{ $row->recommended_action ?? '—' }}</td>
                         @elseif($tab === 'storage')
                             <td class="px-4 py-3 text-sm text-gray-600">{{ $row->server_name ?? '—' }}</td>
+                            <td class="px-4 py-3 text-xs text-gray-500 max-w-xs truncate">{{ $row->message ?? '—' }}</td>
+                            <td class="px-4 py-3 text-xs text-blue-600 max-w-xs truncate">{{ $row->recommended_action ?? '—' }}</td>
                         @elseif($tab === 'raid')
                             <td class="px-4 py-3 text-sm font-semibold {{ $row->count_alerts > 0 ? 'text-red-600' : 'text-gray-400' }}">{{ $row->count_alerts }}</td>
                         @elseif($tab === 'alarms')

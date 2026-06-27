@@ -578,7 +578,7 @@ class NocSyncController extends Controller
                 $serverName = $e['serverName'] ?? $e['server_name'] ?? null;
                 HubKdmError::updateOrCreate(
                     ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'cpl_id' => $cplId, 'server_name' => $serverName],
-                    ['annotation_text' => $e['annotationText'] ?? $e['annotation_text'] ?? null, 'details' => $e['details'] ?? null, 'date_time' => $e['date_time'] ?? null, 'synced_at' => now()]
+                    ['annotation_text' => $e['annotationText'] ?? $e['annotation_text'] ?? null, 'details' => $e['details'] ?? null, 'message' => $e['message'] ?? null, 'recommended_action' => $e['recommended_action'] ?? null, 'date_time' => $e['date_time'] ?? null, 'synced_at' => now()]
                 );
                 $syncedKdmKeys[] = [$loc->id, $cplId, $serverName];
                 $synced++;
@@ -600,7 +600,7 @@ class NocSyncController extends Controller
                 $eventId  = $e['eventId'] ?? null;
                 HubServerError::updateOrCreate(
                     ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'event_id' => $eventId],
-                    ['date' => $e['date'] ?? null, 'class' => $e['class'] ?? null, 'type' => $e['type'] ?? null, 'sub_type' => $e['subType'] ?? null, 'criticity' => $e['criticity'] ?? null, 'error_code' => $e['errorCode'] ?? null, 'server_name' => $e['serverName'] ?? null, 'synced_at' => now()]
+                    ['date' => $e['date'] ?? null, 'class' => $e['class'] ?? null, 'type' => $e['type'] ?? null, 'sub_type' => $e['subType'] ?? null, 'criticity' => $e['criticity'] ?? null, 'error_code' => $e['errorCode'] ?? null, 'server_name' => $e['serverName'] ?? null, 'message' => $e['message'] ?? null, 'recommended_action' => $e['recommended_action'] ?? null, 'synced_at' => now()]
                 );
                 if ($eventId !== null) $syncedEventIds[] = $eventId;
                 $synced++;
@@ -617,7 +617,7 @@ class NocSyncController extends Controller
                 $serverName = $e['serverName'] ?? null;
                 HubProjectorError::updateOrCreate(
                     ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'code' => $code, 'server_name' => $serverName],
-                    ['title' => $e['title'] ?? null, 'time_saved' => $e['time_saved'] ?? null, 'severity' => $e['severity'] ?? null, 'message' => $e['message'] ?? null, 'synced_at' => now()]
+                    ['title' => $e['title'] ?? null, 'time_saved' => $e['time_saved'] ?? null, 'severity' => $e['severity'] ?? null, 'message' => $e['message'] ?? null, 'recommended_action' => $e['recommended_action'] ?? null, 'synced_at' => now()]
                 );
                 $syncedProjectorKeys[] = [$loc->id, $code, $serverName];
                 $synced++;
@@ -639,7 +639,7 @@ class NocSyncController extends Controller
                 $alarmId = $e['alarm_id'] ?? null;
                 HubSoundError::updateOrCreate(
                     ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'alarm_id' => $alarmId],
-                    ['date_saved' => $e['date_saved'] ?? null, 'severity' => $e['severity'] ?? null, 'title' => $e['title'] ?? null, 'clearable' => $e['clearable'] ?? null, 'hardware' => $e['hardware'] ?? null, 'screen' => $e['screen'] ?? null, 'synced_at' => now()]
+                    ['date_saved' => $e['date_saved'] ?? null, 'severity' => $e['severity'] ?? null, 'title' => $e['title'] ?? null, 'clearable' => $e['clearable'] ?? null, 'hardware' => $e['hardware'] ?? null, 'screen' => $e['screen'] ?? null, 'message' => $e['message'] ?? null, 'recommended_action' => $e['recommended_action'] ?? null, 'synced_at' => now()]
                 );
                 if ($alarmId !== null) $syncedAlarmIds[] = $alarmId;
                 $synced++;
@@ -655,7 +655,7 @@ class NocSyncController extends Controller
                 $serverName = $e['serverName'] ?? $e['server_name'] ?? null;
                 HubStorageError::updateOrCreate(
                     ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'server_name' => $serverName],
-                    ['synced_at' => now()]
+                    ['message' => $e['message'] ?? null, 'recommended_action' => $e['recommended_action'] ?? null, 'synced_at' => now()]
                 );
                 $syncedStorageKeys[] = [$loc->id, $serverName];
                 $synced++;
