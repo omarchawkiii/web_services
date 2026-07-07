@@ -377,7 +377,8 @@ Returns aggregated error counts across all of the user's locations.
   "nbr_projector_alert": 2,
   "nbr_server_alert": 0,
   "nbr_storage_errors": 1,
-  "total_errors": 7
+  "nbr_tms_alert": 2,
+  "total_errors": 9
 }
 ```
 
@@ -388,6 +389,7 @@ Returns aggregated error counts across all of the user's locations.
 | `nbr_projector_alert` | Projector alerts |
 | `nbr_server_alert` | Server alerts |
 | `nbr_storage_errors` | Storage errors |
+| `nbr_tms_alert` | TMS alerts |
 | `total_errors` | Sum of all above |
 
 ---
@@ -438,14 +440,24 @@ GET /errors/server
       "id": 1,
       "location_id": 3,
       "noc_instance_id": 1,
-      "eventId": "EVT-001",
+      "event_id": "EVT-001",
       "date": "2026-06-05 09:15:00",
       "class": "Hardware",
       "type": "Disk",
-      "subType": "ReadError",
+      "sub_type": "ReadError",
       "criticity": "High",
-      "errorCode": "0x1A2B",
-      "serverName": "TMS-Server-01",
+      "error_code": "0x1A2B",
+      "server_name": "TMS-Server-01",
+      "message": "Disk read error on sector 0x1A2B",
+      "recommended_action": "Replace the faulty disk.",
+      "ip_projector": "192.168.1.10",
+      "projector_brand": "Barco",
+      "projector_ip": "192.168.1.11",
+      "projector_model": "DP2K-10S",
+      "sound_brand": "QSC",
+      "screen_model": "Screen 1",
+      "display_message": "Disk fault detected on primary storage array.",
+      "synced_at": "2026-07-07T08:00:00.000000Z",
       "location": { "id": 3, "name": "BPJ Cinema" },
       "noc_instance": { "id": 1, "name": "NOC Malaysia" }
     }
@@ -475,7 +487,12 @@ GET /errors/projector
       "code": "E-042",
       "severity": "Warning",
       "message": "Lamp hours exceeded threshold",
-      "serverName": "Projector-Screen1",
+      "recommended_action": "Schedule lamp replacement within 48h.",
+      "server_name": "Projector-Screen1",
+      "projector_brand": "Barco",
+      "projector_model": "DP2K-10S",
+      "display_message": "Lamp runtime has exceeded the recommended threshold.",
+      "synced_at": "2026-07-07T08:00:00.000000Z",
       "location": { "id": 3, "name": "BPJ Cinema" },
       "noc_instance": { "id": 1, "name": "NOC Malaysia" }
     }
@@ -507,6 +524,13 @@ GET /errors/sound
       "clearable": true,
       "hardware": "QSC Amp-1",
       "screen": "Screen 2",
+      "message": "Amplifier channel 1 fault detected.",
+      "recommended_action": "Check amplifier power supply and cable connections.",
+      "device_sub_type_model": "CX-602",
+      "device_sub_type_title": "Crown Amplifier",
+      "sound_ip": "192.168.1.20",
+      "display_message": "Critical fault on amplifier unit CX-602.",
+      "synced_at": "2026-07-07T08:00:00.000000Z",
       "location": { "id": 3, "name": "BPJ Cinema" },
       "noc_instance": { "id": 1, "name": "NOC Malaysia" }
     }
@@ -531,7 +555,17 @@ GET /errors/storage
       "id": 1,
       "location_id": 3,
       "noc_instance_id": 1,
-      "serverName": "NAS-Server-01",
+      "server_name": "NAS-Server-01",
+      "message": "RAID array degraded — one disk failed.",
+      "recommended_action": "Replace failed disk immediately.",
+      "storage_generale_status": "critical",
+      "projector_brand": "Barco",
+      "projector_ip": "192.168.1.11",
+      "projector_model": "DP2K-10S",
+      "sound_brand": "QSC",
+      "screen_model": "Screen 1",
+      "display_message": "RAID array in degraded state. Immediate attention required.",
+      "synced_at": "2026-07-07T08:00:00.000000Z",
       "location": { "id": 3, "name": "BPJ Cinema" },
       "noc_instance": { "id": 1, "name": "NOC Malaysia" }
     }
@@ -541,7 +575,56 @@ GET /errors/storage
 
 ---
 
-### 18. RAID Alerts
+### 18. TMS Errors
+
+```
+GET /errors/tms
+```
+
+Returns the list of TMS (Theatre Management System) errors.
+
+**Success response — 200 OK:**
+
+```json
+{
+  "tms_errors_list": [
+    {
+      "id": 1,
+      "location_id": 3,
+      "noc_instance_id": 1,
+      "id_tms_error": "TMS-ERR-001",
+      "title": "Network timeout",
+      "code": "NET-001",
+      "severity": "high",
+      "message": "Connection to projector timed out.",
+      "time_saved": "2026-07-07 08:00:00",
+      "id_screen": 7,
+      "ip_projector": "192.168.1.10",
+      "recommended_action": "Check network cable and projector power.",
+      "display_message": "Projector at 192.168.1.10 is unreachable.",
+      "device_sub_type": "projector",
+      "device_sub_type_ip": "192.168.1.11",
+      "device_sub_type_model": "DP2K-10S",
+      "device_sub_type_title": "Barco Projector",
+      "server_name": "Screen 1",
+      "screen_model": "DP2K",
+      "projector_ip": "192.168.1.11",
+      "projector_brand": "Barco",
+      "projector_model": "DP2K-10S",
+      "sound_ip": "192.168.1.20",
+      "sound_brand": "QSC",
+      "number": 1,
+      "synced_at": "2026-07-07T08:00:00.000000Z",
+      "location": { "id": 3, "name": "BPJ Cinema" },
+      "noc_instance": { "id": 1, "name": "NOC Malaysia" }
+    }
+  ]
+}
+```
+
+---
+
+### 19. RAID Alerts
 
 ```
 GET /errors/raid
@@ -569,7 +652,7 @@ GET /errors/raid
 
 ---
 
-### 19. Server Alarms
+### 20. Server Alarms
 
 ```
 GET /errors/server-alarms
@@ -640,6 +723,7 @@ GET /errors/server-alarms
 | GET | `/errors/projector` | Yes | Projector errors list |
 | GET | `/errors/sound` | Yes | Sound errors list |
 | GET | `/errors/storage` | Yes | Storage errors list |
+| GET | `/errors/tms` | Yes | TMS errors list |
 | GET | `/errors/raid` | Yes | RAID alerts list |
 | GET | `/errors/server-alarms` | Yes | Server alarms list |
 
