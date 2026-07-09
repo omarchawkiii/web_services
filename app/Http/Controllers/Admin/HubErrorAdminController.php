@@ -3,7 +3,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\HubErrorSummary;
-use App\Models\HubKdmError;
 use App\Models\HubProjectorError;
 use App\Models\HubRaidAlert;
 use App\Models\HubServerAlarm;
@@ -33,7 +32,6 @@ class HubErrorAdminController extends Controller
         $summaries = $summaryQuery->with(['location','nocInstance'])->get();
 
         $totals = [
-            'kdm'       => $summaries->sum('kdm_errors'),
             'sound'     => $summaries->sum('nbr_sound_alert'),
             'projector' => $summaries->sum('nbr_projector_alert'),
             'server'    => $summaries->sum('nbr_server_alert'),
@@ -48,7 +46,6 @@ class HubErrorAdminController extends Controller
             ->with(['location','nocInstance']);
 
         $data = match($tab) {
-            'kdm'      => $filter(HubKdmError::query())->get(),
             'server'   => $filter(HubServerError::query())->get(),
             'projector'=> $filter(HubProjectorError::query())->get(),
             'sound'    => $filter(HubSoundError::query())->get(),

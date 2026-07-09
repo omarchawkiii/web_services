@@ -597,7 +597,7 @@ class NocSyncController extends Controller
             $syncedEventIds = [];
             foreach ($request->input('server_errors', []) as $e) {
                 $loc      = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
-                $eventId  = $e['eventId'] ?? null;
+                $eventId  = $e['id_server_error'] ?? $e['eventId'] ?? null;
                 HubServerError::updateOrCreate(
                     ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'event_id' => $eventId],
                     ['date' => $e['date'] ?? null, 'class' => $e['class'] ?? null, 'type' => $e['type'] ?? null, 'sub_type' => $e['subType'] ?? null, 'criticity' => $e['criticity'] ?? null, 'error_code' => $e['errorCode'] ?? null, 'server_name' => $e['serverName'] ?? null, 'message' => $e['message'] ?? null, 'recommended_action' => $e['recommended_action'] ?? null, 'ip_projector' => $e['ip_projector'] ?? null, 'projector_brand' => $e['projector_brand'] ?? null, 'projector_ip' => $e['projector_ip'] ?? null, 'projector_model' => $e['projector_model'] ?? null, 'sound_brand' => $e['sound_brand'] ?? null, 'screen_model' => $e['screenModel'] ?? $e['screen_model'] ?? null, 'display_message' => $e['display_message'] ?? null, 'synced_at' => now()]
