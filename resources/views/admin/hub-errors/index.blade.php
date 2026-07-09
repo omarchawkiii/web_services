@@ -126,7 +126,7 @@
 
 {{-- Tabs --}}
 @php
-$tabs = ['summary','server','projector','sound','storage','tms','raid','alarms'];
+$tabs = ['summary','server','projector','sound','storage','tms'];
 @endphp
 <div class="mb-4 flex flex-wrap gap-2">
     @foreach($tabs as $t)

@@ -73,8 +73,7 @@ Route::prefix('hub/mobile')->name('hub.mobile.')->group(function () {
             Route::get('/projector',     [HubErrorController::class, 'projector'])->name('projector');
             Route::get('/sound',         [HubErrorController::class, 'sound'])->name('sound');
             Route::get('/storage',       [HubErrorController::class, 'storage'])->name('storage');
-            Route::get('/raid',          [HubErrorController::class, 'raid'])->name('raid');
-            Route::get('/server-alarms', [HubErrorController::class, 'serverAlarms'])->name('server-alarms');
+
             Route::get('/tms',           [HubErrorController::class, 'tms'])->name('tms');
         });
     });

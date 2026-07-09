@@ -624,63 +624,6 @@ Returns the list of TMS (Theatre Management System) errors.
 
 ---
 
-### 19. RAID Alerts
-
-```
-GET /errors/raid
-```
-
-**Success response — 200 OK:**
-
-```json
-{
-  "alerts": [
-    {
-      "id": 1,
-      "location_id": 3,
-      "noc_instance_id": 1,
-      "count_alerts": 2,
-      "alerts": [
-        { "disk": "Disk-2", "status": "Failed", "severity": "Critical" }
-      ],
-      "location": { "id": 3, "name": "BPJ Cinema" },
-      "noc_instance": { "id": 1, "name": "NOC Malaysia" }
-    }
-  ]
-}
-```
-
----
-
-### 20. Server Alarms
-
-```
-GET /errors/server-alarms
-```
-
-**Success response — 200 OK:**
-
-```json
-{
-  "alarms": [
-    {
-      "id": 1,
-      "location_id": 3,
-      "noc_instance_id": 1,
-      "screen_id": 7,
-      "alarm_working_state": "Active",
-      "index_alarm": "IDX-003",
-      "title": "Network Timeout",
-      "location": { "id": 3, "name": "BPJ Cinema" },
-      "noc_instance": { "id": 1, "name": "NOC Malaysia" },
-      "screen": { "id": 7, "screen_name": "Screen 1" }
-    }
-  ]
-}
-```
-
----
-
 ## Error Responses
 
 | HTTP Status | Meaning |
@@ -724,8 +667,6 @@ GET /errors/server-alarms
 | GET | `/errors/sound` | Yes | Sound errors list |
 | GET | `/errors/storage` | Yes | Storage errors list |
 | GET | `/errors/tms` | Yes | TMS errors list |
-| GET | `/errors/raid` | Yes | RAID alerts list |
-| GET | `/errors/server-alarms` | Yes | Server alarms list |
 
 ---
 
