@@ -134,6 +134,7 @@ class NocSyncController extends Controller
             'users.*.email'              => 'required|email',
             'users.*.role'               => 'required|integer|in:1,2,3',
             'users.*.is_active'          => 'nullable|boolean',
+            'users.*.password_hash'      => 'nullable|string',
             'users.*.noc_location_ids'   => 'nullable|array',
             'users.*.noc_location_ids.*' => 'integer',
         ]);
@@ -153,11 +154,17 @@ class NocSyncController extends Controller
 
             if ($existing) {
                 $existing->update($attributes);
+                if (!empty($userData['password_hash'])) {
+                    \DB::table('users')->where('id', $existing->id)->update(['password' => $userData['password_hash']]);
+                }
                 $user = $existing;
                 $synced++;
             } else {
                 if (User::where('email', $userData['email'])->exists()) { $skipped++; continue; }
                 $user = User::create(array_merge($attributes, ['email' => $userData['email'], 'password' => Str::random(32)]));
+                if (!empty($userData['password_hash'])) {
+                    \DB::table('users')->where('id', $user->id)->update(['password' => $userData['password_hash']]);
+                }
                 $synced++;
             }
 
