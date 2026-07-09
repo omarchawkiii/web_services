@@ -612,7 +612,9 @@ class NocSyncController extends Controller
                 if ($eventId !== null) $syncedEventIds[] = $eventId;
                 $synced++;
             }
-            HubServerError::where('noc_instance_id', $noc->id)->whereNotIn('event_id', $syncedEventIds)->delete();
+            if (!empty($syncedEventIds)) {
+                HubServerError::where('noc_instance_id', $noc->id)->whereNotIn('event_id', $syncedEventIds)->delete();
+            }
         }
 
         // ── Projector errors ───────────────────────────────────────────────
@@ -651,7 +653,9 @@ class NocSyncController extends Controller
                 if ($alarmId !== null) $syncedAlarmIds[] = $alarmId;
                 $synced++;
             }
-            HubSoundError::where('noc_instance_id', $noc->id)->whereNotIn('alarm_id', $syncedAlarmIds)->delete();
+            if (!empty($syncedAlarmIds)) {
+                HubSoundError::where('noc_instance_id', $noc->id)->whereNotIn('alarm_id', $syncedAlarmIds)->delete();
+            }
         }
 
         // ── Storage errors ─────────────────────────────────────────────────
