@@ -606,8 +606,9 @@ class NocSyncController extends Controller
                 $eventId    = $e['id_server_error'] ?? $e['eventId'] ?? null;
                 $serverName = $e['serverName'] ?? null;
                 HubServerError::updateOrCreate(
-                    ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'event_id' => $eventId, 'server_name' => $serverName],
+                    ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'event_id' => $eventId],
                     [
+                        'server_name'      => $serverName,
                         'date'             => $e['date'] ?? null,
                         'class'            => $e['class'] ?? null,
                         'type'             => $e['type'] ?? null,
