@@ -225,6 +225,12 @@ $tabs = ['summary','server','projector','sound','storage','tms'];
                                         <div class="err-detail-item">Sound Brand: <span>{{ $row->sound_brand ?? '—' }}</span></div>
                                     </div>
                                     <div>
+                                        <div class="err-detail-section-label">Server Details</div>
+                                        <div class="err-detail-item">Show Title: <span>{{ $row->show_title ?? '—' }}</span></div>
+                                        <div class="err-detail-item">Serial Number: <span>{{ $row->serial_number ?? '—' }}</span></div>
+                                        <div class="err-detail-item">Certificate Date: <span>{{ $row->certificat_date ?? '—' }}</span></div>
+                                    </div>
+                                    <div>
                                         <div class="err-detail-section-label">Recommended Action</div>
                                         <div class="err-detail-item"><span style="white-space:pre-wrap;word-break:break-word;">{{ $row->recommended_action ?? '—' }}</span></div>
                                     </div>

@@ -628,6 +628,9 @@ class NocSyncController extends Controller
                     'sound_brand'      => $e['sound_brand'] ?? null,
                     'screen_model'     => $e['screenModel'] ?? $e['screen_model'] ?? null,
                     'display_message'  => $e['display_message'] ?? null,
+                    'certificat_date'  => $e['certificat_date'] ?? null,
+                    'serial_number'    => $e['serialNumber'] ?? $e['serial_number'] ?? null,
+                    'show_title'       => $e['showTitle'] ?? $e['show_title'] ?? null,
                     'synced_at'        => now(),
                 ]);
                 $synced++;
