@@ -590,56 +590,51 @@ class NocSyncController extends Controller
                 $syncedKdmKeys[] = [$loc->id, $cplId, $serverName];
                 $synced++;
             }
-            $query = HubKdmError::where('noc_instance_id', $noc->id);
             if (!empty($syncedKdmKeys)) {
                 $placeholders = implode(',', array_fill(0, count($syncedKdmKeys), '(?,?,?)'));
                 $bindings     = array_merge(...$syncedKdmKeys);
-                $query->whereRaw("(location_id, cpl_id, server_name) NOT IN ({$placeholders})", $bindings);
+                HubKdmError::where('noc_instance_id', $noc->id)
+                    ->whereRaw("(location_id, cpl_id, server_name) NOT IN ({$placeholders})", $bindings)
+                    ->delete();
             }
-            $query->delete();
         }
 
         // ── Server errors ──────────────────────────────────────────────────
         if ($request->has('server_errors')) {
-            $clearedLocationIds = [];
             foreach ($request->input('server_errors', []) as $e) {
-                $loc = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
-                if (!in_array($loc->id, $clearedLocationIds)) {
-                    HubServerError::where('noc_instance_id', $noc->id)->where('location_id', $loc->id)->delete();
-                    $clearedLocationIds[] = $loc->id;
-                }
-                HubServerError::create([
-                    'noc_instance_id'  => $noc->id,
-                    'location_id'      => $loc->id,
-                    'event_id'         => $e['id_server_error'] ?? $e['eventId'] ?? null,
-                    'date'             => $e['date'] ?? null,
-                    'class'            => $e['class'] ?? null,
-                    'type'             => $e['type'] ?? null,
-                    'sub_type'         => $e['subType'] ?? null,
-                    'criticity'        => $e['criticity'] ?? null,
-                    'error_code'       => $e['errorCode'] ?? null,
-                    'server_name'      => $e['serverName'] ?? null,
-                    'message'          => $e['message'] ?? null,
-                    'recommended_action' => $e['recommended_action'] ?? null,
-                    'ip_projector'     => $e['ip_projector'] ?? null,
-                    'projector_brand'  => $e['projector_brand'] ?? null,
-                    'projector_ip'     => $e['projector_ip'] ?? null,
-                    'projector_model'  => $e['projector_model'] ?? null,
-                    'sound_brand'      => $e['sound_brand'] ?? null,
-                    'screen_model'     => $e['screenModel'] ?? $e['screen_model'] ?? null,
-                    'display_message'  => $e['display_message'] ?? null,
-                    'certificat_date'  => $e['certificat_date'] ?? null,
-                    'serial_number'    => $e['serialNumber'] ?? $e['serial_number'] ?? null,
-                    'show_title'       => $e['showTitle'] ?? $e['show_title'] ?? null,
-                    'synced_at'        => now(),
-                ]);
+                $loc        = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
+                $eventId    = $e['id_server_error'] ?? $e['eventId'] ?? null;
+                $serverName = $e['serverName'] ?? null;
+                HubServerError::updateOrCreate(
+                    ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'event_id' => $eventId, 'server_name' => $serverName],
+                    [
+                        'date'             => $e['date'] ?? null,
+                        'class'            => $e['class'] ?? null,
+                        'type'             => $e['type'] ?? null,
+                        'sub_type'         => $e['subType'] ?? null,
+                        'criticity'        => $e['criticity'] ?? null,
+                        'error_code'       => $e['errorCode'] ?? null,
+                        'message'          => $e['message'] ?? null,
+                        'recommended_action' => $e['recommended_action'] ?? null,
+                        'ip_projector'     => $e['ip_projector'] ?? null,
+                        'projector_brand'  => $e['projector_brand'] ?? null,
+                        'projector_ip'     => $e['projector_ip'] ?? null,
+                        'projector_model'  => $e['projector_model'] ?? null,
+                        'sound_brand'      => $e['sound_brand'] ?? null,
+                        'screen_model'     => $e['screenModel'] ?? $e['screen_model'] ?? null,
+                        'display_message'  => $e['display_message'] ?? null,
+                        'certificat_date'  => $e['certificat_date'] ?? null,
+                        'serial_number'    => $e['serialNumber'] ?? $e['serial_number'] ?? null,
+                        'show_title'       => $e['showTitle'] ?? $e['show_title'] ?? null,
+                        'synced_at'        => now(),
+                    ]
+                );
                 $synced++;
             }
         }
 
         // ── Projector errors ───────────────────────────────────────────────
         if ($request->has('projector_errors')) {
-            $syncedProjectorKeys = [];
             foreach ($request->input('projector_errors', []) as $e) {
                 $loc        = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
                 $code       = $e['code'] ?? null;
@@ -648,21 +643,12 @@ class NocSyncController extends Controller
                     ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'code' => $code, 'server_name' => $serverName],
                     ['title' => $e['title'] ?? null, 'time_saved' => $e['time_saved'] ?? null, 'severity' => $e['severity'] ?? null, 'message' => $e['message'] ?? null, 'recommended_action' => $e['recommended_action'] ?? null, 'projector_brand' => $e['projector_brand'] ?? null, 'projector_model' => $e['projector_model'] ?? null, 'display_message' => $e['display_message'] ?? null, 'synced_at' => now()]
                 );
-                $syncedProjectorKeys[] = [$loc->id, $code, $serverName];
                 $synced++;
             }
-            $query = HubProjectorError::where('noc_instance_id', $noc->id);
-            if (!empty($syncedProjectorKeys)) {
-                $placeholders = implode(',', array_fill(0, count($syncedProjectorKeys), '(?,?,?)'));
-                $bindings     = array_merge(...$syncedProjectorKeys);
-                $query->whereRaw("(location_id, code, server_name) NOT IN ({$placeholders})", $bindings);
-            }
-            $query->delete();
         }
 
         // ── Sound errors ───────────────────────────────────────────────────
         if ($request->has('sound_errors')) {
-            $syncedAlarmIds = [];
             foreach ($request->input('sound_errors', []) as $e) {
                 $loc     = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
                 $alarmId = $e['alarm_id'] ?? null;
@@ -670,17 +656,12 @@ class NocSyncController extends Controller
                     ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'alarm_id' => $alarmId],
                     ['date_saved' => $e['date_saved'] ?? null, 'severity' => $e['severity'] ?? null, 'title' => $e['title'] ?? null, 'clearable' => $e['clearable'] ?? null, 'hardware' => $e['hardware'] ?? null, 'screen' => $e['screen'] ?? null, 'message' => $e['message'] ?? null, 'recommended_action' => $e['recommended_action'] ?? null, 'device_sub_type_model' => $e['device_sub_type_model'] ?? null, 'device_sub_type_title' => $e['device_sub_type_title'] ?? null, 'sound_ip' => $e['sound_ip'] ?? null, 'display_message' => $e['display_message'] ?? null, 'synced_at' => now()]
                 );
-                if ($alarmId !== null) $syncedAlarmIds[] = $alarmId;
                 $synced++;
-            }
-            if (!empty($syncedAlarmIds)) {
-                HubSoundError::where('noc_instance_id', $noc->id)->whereNotIn('alarm_id', $syncedAlarmIds)->delete();
             }
         }
 
         // ── Storage errors ─────────────────────────────────────────────────
         if ($request->has('storage_errors')) {
-            $syncedStorageKeys = [];
             foreach ($request->input('storage_errors', []) as $e) {
                 $loc        = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
                 $serverName = $e['serverName'] ?? $e['server_name'] ?? null;
@@ -688,23 +669,12 @@ class NocSyncController extends Controller
                     ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'server_name' => $serverName],
                     ['message' => $e['message'] ?? null, 'recommended_action' => $e['recommended_action'] ?? null, 'storage_generale_status' => $e['storage_generale_status'] ?? $e['severity'] ?? null, 'projector_brand' => $e['projector_brand'] ?? null, 'projector_ip' => $e['projector_ip'] ?? null, 'projector_model' => $e['projector_model'] ?? null, 'sound_brand' => $e['sound_brand'] ?? null, 'screen_model' => $e['screenModel'] ?? $e['screen_model'] ?? null, 'display_message' => $e['display_message'] ?? null, 'synced_at' => now()]
                 );
-                $syncedStorageKeys[] = [$loc->id, $serverName];
                 $synced++;
-            }
-            if (!empty($syncedStorageKeys)) {
-                $placeholders = implode(',', array_fill(0, count($syncedStorageKeys), '(?,?)'));
-                $bindings     = array_merge(...array_map(fn($k) => $k, $syncedStorageKeys));
-                HubStorageError::where('noc_instance_id', $noc->id)
-                    ->whereRaw("(location_id, server_name) NOT IN ({$placeholders})", $bindings)
-                    ->delete();
-            } else {
-                HubStorageError::where('noc_instance_id', $noc->id)->delete();
             }
         }
 
         // ── TMS errors ─────────────────────────────────────────────────────
         if ($request->has('tms_errors')) {
-            $syncedTmsIds = [];
             foreach ($request->input('tms_errors', []) as $e) {
                 $loc       = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
                 $idTmsError = $e['id_tms_error'] ?? null;
@@ -736,10 +706,8 @@ class NocSyncController extends Controller
                         'synced_at'             => now(),
                     ]
                 );
-                if ($idTmsError !== null) $syncedTmsIds[] = $idTmsError;
                 $synced++;
             }
-            HubTmsError::where('noc_instance_id', $noc->id)->whereNotIn('id_tms_error', $syncedTmsIds)->delete();
         }
 
         // ── RAID alerts ────────────────────────────────────────────────────
@@ -769,7 +737,9 @@ class NocSyncController extends Controller
                 if ($indexAlarm !== null) $syncedIndexes[] = $indexAlarm;
                 $synced++;
             }
-            HubServerAlarm::where('noc_instance_id', $noc->id)->whereNotIn('index_alarm', $syncedIndexes)->delete();
+            if (!empty($syncedIndexes)) {
+                HubServerAlarm::where('noc_instance_id', $noc->id)->whereNotIn('index_alarm', $syncedIndexes)->delete();
+            }
         }
 
         $noc->update(['last_sync_at' => now(), 'sync_status' => 'online']);
