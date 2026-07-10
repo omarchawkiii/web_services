@@ -601,113 +601,183 @@ class NocSyncController extends Controller
 
         // ── Server errors ──────────────────────────────────────────────────
         if ($request->has('server_errors')) {
+            $rows = [];
             foreach ($request->input('server_errors', []) as $e) {
-                $loc        = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
-                $eventId    = $e['id_server_error'] ?? $e['eventId'] ?? null;
-                $serverName = $e['serverName'] ?? null;
-                HubServerError::updateOrCreate(
-                    ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'event_id' => $eventId],
-                    [
-                        'server_name'      => $serverName,
-                        'date'             => $e['date'] ?? null,
-                        'class'            => $e['class'] ?? null,
-                        'type'             => $e['type'] ?? null,
-                        'sub_type'         => $e['subType'] ?? null,
-                        'criticity'        => $e['criticity'] ?? null,
-                        'error_code'       => $e['errorCode'] ?? null,
-                        'message'          => $e['message'] ?? null,
-                        'recommended_action' => $e['recommended_action'] ?? null,
-                        'ip_projector'     => $e['ip_projector'] ?? null,
-                        'projector_brand'  => $e['projector_brand'] ?? null,
-                        'projector_ip'     => $e['projector_ip'] ?? null,
-                        'projector_model'  => $e['projector_model'] ?? null,
-                        'sound_brand'      => $e['sound_brand'] ?? null,
-                        'screen_model'     => $e['screenModel'] ?? $e['screen_model'] ?? null,
-                        'display_message'  => $e['display_message'] ?? null,
-                        'certificat_date'  => $e['certificat_date'] ?? null,
-                        'serial_number'    => $e['serialNumber'] ?? $e['serial_number'] ?? null,
-                        'show_title'       => $e['showTitle'] ?? $e['show_title'] ?? null,
-                        'synced_at'        => now(),
-                    ]
-                );
-                $synced++;
+                $loc = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
+                $rows[] = [
+                    'noc_instance_id'  => $noc->id,
+                    'location_id'      => $loc->id,
+                    'event_id'         => $e['id_server_error'] ?? $e['eventId'] ?? null,
+                    'server_name'      => $e['serverName'] ?? null,
+                    'date'             => $e['date'] ?? null,
+                    'class'            => $e['class'] ?? null,
+                    'type'             => $e['type'] ?? null,
+                    'sub_type'         => $e['subType'] ?? null,
+                    'criticity'        => $e['criticity'] ?? null,
+                    'error_code'       => $e['errorCode'] ?? null,
+                    'message'          => $e['message'] ?? null,
+                    'recommended_action' => $e['recommended_action'] ?? null,
+                    'ip_projector'     => $e['ip_projector'] ?? null,
+                    'projector_brand'  => $e['projector_brand'] ?? null,
+                    'projector_ip'     => $e['projector_ip'] ?? null,
+                    'projector_model'  => $e['projector_model'] ?? null,
+                    'sound_brand'      => $e['sound_brand'] ?? null,
+                    'screen_model'     => $e['screenModel'] ?? $e['screen_model'] ?? null,
+                    'display_message'  => $e['display_message'] ?? null,
+                    'certificat_date'  => $e['certificat_date'] ?? null,
+                    'serial_number'    => $e['serialNumber'] ?? $e['serial_number'] ?? null,
+                    'show_title'       => $e['showTitle'] ?? $e['show_title'] ?? null,
+                    'synced_at'        => now(),
+                ];
+            }
+            if (!empty($rows)) {
+                HubServerError::upsert($rows, ['noc_instance_id', 'location_id', 'event_id'], [
+                    'server_name', 'date', 'class', 'type', 'sub_type', 'criticity', 'error_code', 'message',
+                    'recommended_action', 'ip_projector', 'projector_brand', 'projector_ip', 'projector_model',
+                    'sound_brand', 'screen_model', 'display_message', 'certificat_date', 'serial_number',
+                    'show_title', 'synced_at',
+                ]);
+                $synced += count($rows);
             }
         }
 
         // ── Projector errors ───────────────────────────────────────────────
         if ($request->has('projector_errors')) {
+            $rows = [];
             foreach ($request->input('projector_errors', []) as $e) {
-                $loc        = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
-                $code       = $e['code'] ?? null;
-                $serverName = $e['serverName'] ?? null;
-                HubProjectorError::updateOrCreate(
-                    ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'code' => $code, 'server_name' => $serverName],
-                    ['title' => $e['title'] ?? null, 'time_saved' => $e['time_saved'] ?? null, 'severity' => $e['severity'] ?? null, 'message' => $e['message'] ?? null, 'recommended_action' => $e['recommended_action'] ?? null, 'projector_brand' => $e['projector_brand'] ?? null, 'projector_model' => $e['projector_model'] ?? null, 'display_message' => $e['display_message'] ?? null, 'synced_at' => now()]
-                );
-                $synced++;
+                $loc = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
+                $rows[] = [
+                    'noc_instance_id'    => $noc->id,
+                    'location_id'        => $loc->id,
+                    'code'               => $e['code'] ?? null,
+                    'server_name'        => $e['serverName'] ?? null,
+                    'title'              => $e['title'] ?? null,
+                    'time_saved'         => $e['time_saved'] ?? null,
+                    'severity'           => $e['severity'] ?? null,
+                    'message'            => $e['message'] ?? null,
+                    'recommended_action' => $e['recommended_action'] ?? null,
+                    'projector_brand'    => $e['projector_brand'] ?? null,
+                    'projector_model'    => $e['projector_model'] ?? null,
+                    'display_message'    => $e['display_message'] ?? null,
+                    'synced_at'          => now(),
+                ];
+            }
+            if (!empty($rows)) {
+                HubProjectorError::upsert($rows, ['noc_instance_id', 'location_id', 'code', 'server_name'], [
+                    'title', 'time_saved', 'severity', 'message', 'recommended_action', 'projector_brand',
+                    'projector_model', 'display_message', 'synced_at',
+                ]);
+                $synced += count($rows);
             }
         }
 
         // ── Sound errors ───────────────────────────────────────────────────
         if ($request->has('sound_errors')) {
+            $rows = [];
             foreach ($request->input('sound_errors', []) as $e) {
-                $loc     = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
-                $alarmId = $e['alarm_id'] ?? null;
-                HubSoundError::updateOrCreate(
-                    ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'alarm_id' => $alarmId],
-                    ['date_saved' => $e['date_saved'] ?? null, 'severity' => $e['severity'] ?? null, 'title' => $e['title'] ?? null, 'clearable' => $e['clearable'] ?? null, 'hardware' => $e['hardware'] ?? null, 'screen' => $e['screen'] ?? null, 'message' => $e['message'] ?? null, 'recommended_action' => $e['recommended_action'] ?? null, 'device_sub_type_model' => $e['device_sub_type_model'] ?? null, 'device_sub_type_title' => $e['device_sub_type_title'] ?? null, 'sound_ip' => $e['sound_ip'] ?? null, 'display_message' => $e['display_message'] ?? null, 'synced_at' => now()]
-                );
-                $synced++;
+                $loc = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
+                $rows[] = [
+                    'noc_instance_id'       => $noc->id,
+                    'location_id'           => $loc->id,
+                    'alarm_id'              => $e['alarm_id'] ?? null,
+                    'date_saved'            => $e['date_saved'] ?? null,
+                    'severity'              => $e['severity'] ?? null,
+                    'title'                 => $e['title'] ?? null,
+                    'clearable'             => $e['clearable'] ?? null,
+                    'hardware'              => $e['hardware'] ?? null,
+                    'screen'                => $e['screen'] ?? null,
+                    'message'               => $e['message'] ?? null,
+                    'recommended_action'    => $e['recommended_action'] ?? null,
+                    'device_sub_type_model' => $e['device_sub_type_model'] ?? null,
+                    'device_sub_type_title' => $e['device_sub_type_title'] ?? null,
+                    'sound_ip'              => $e['sound_ip'] ?? null,
+                    'display_message'       => $e['display_message'] ?? null,
+                    'synced_at'             => now(),
+                ];
+            }
+            if (!empty($rows)) {
+                HubSoundError::upsert($rows, ['noc_instance_id', 'location_id', 'alarm_id'], [
+                    'date_saved', 'severity', 'title', 'clearable', 'hardware', 'screen', 'message',
+                    'recommended_action', 'device_sub_type_model', 'device_sub_type_title', 'sound_ip',
+                    'display_message', 'synced_at',
+                ]);
+                $synced += count($rows);
             }
         }
 
         // ── Storage errors ─────────────────────────────────────────────────
         if ($request->has('storage_errors')) {
+            $rows = [];
             foreach ($request->input('storage_errors', []) as $e) {
-                $loc        = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
-                $serverName = $e['serverName'] ?? $e['server_name'] ?? null;
-                HubStorageError::updateOrCreate(
-                    ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'server_name' => $serverName],
-                    ['message' => $e['message'] ?? null, 'recommended_action' => $e['recommended_action'] ?? null, 'storage_generale_status' => $e['storage_generale_status'] ?? $e['severity'] ?? null, 'projector_brand' => $e['projector_brand'] ?? null, 'projector_ip' => $e['projector_ip'] ?? null, 'projector_model' => $e['projector_model'] ?? null, 'sound_brand' => $e['sound_brand'] ?? null, 'screen_model' => $e['screenModel'] ?? $e['screen_model'] ?? null, 'display_message' => $e['display_message'] ?? null, 'synced_at' => now()]
-                );
-                $synced++;
+                $loc = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
+                $rows[] = [
+                    'noc_instance_id'         => $noc->id,
+                    'location_id'             => $loc->id,
+                    'server_name'             => $e['serverName'] ?? $e['server_name'] ?? null,
+                    'message'                 => $e['message'] ?? null,
+                    'recommended_action'      => $e['recommended_action'] ?? null,
+                    'storage_generale_status' => $e['storage_generale_status'] ?? $e['severity'] ?? null,
+                    'projector_brand'         => $e['projector_brand'] ?? null,
+                    'projector_ip'            => $e['projector_ip'] ?? null,
+                    'projector_model'         => $e['projector_model'] ?? null,
+                    'sound_brand'             => $e['sound_brand'] ?? null,
+                    'screen_model'            => $e['screenModel'] ?? $e['screen_model'] ?? null,
+                    'display_message'         => $e['display_message'] ?? null,
+                    'synced_at'               => now(),
+                ];
+            }
+            if (!empty($rows)) {
+                HubStorageError::upsert($rows, ['noc_instance_id', 'location_id', 'server_name'], [
+                    'message', 'recommended_action', 'storage_generale_status', 'projector_brand', 'projector_ip',
+                    'projector_model', 'sound_brand', 'screen_model', 'display_message', 'synced_at',
+                ]);
+                $synced += count($rows);
             }
         }
 
         // ── TMS errors ─────────────────────────────────────────────────────
         if ($request->has('tms_errors')) {
+            $rows = [];
             foreach ($request->input('tms_errors', []) as $e) {
-                $loc       = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
-                $idTmsError = $e['id_tms_error'] ?? null;
-                HubTmsError::updateOrCreate(
-                    ['noc_instance_id' => $noc->id, 'location_id' => $loc->id, 'id_tms_error' => $idTmsError],
-                    [
-                        'title'                 => $e['title']                 ?? null,
-                        'code'                  => $e['code']                  ?? null,
-                        'severity'              => $e['severity']              ?? null,
-                        'message'               => $e['message']               ?? null,
-                        'time_saved'            => $e['time_saved']            ?? null,
-                        'id_screen'             => $e['id_screen']             ?? null,
-                        'ip_projector'          => $e['ip_projector']          ?? null,
-                        'display_message'       => $e['display_message']       ?? null,
-                        'recommended_action'    => $e['recommended_action']    ?? null,
-                        'device_sub_type'       => $e['device_sub_type']       ?? null,
-                        'device_sub_type_ip'    => $e['device_sub_type_ip']    ?? null,
-                        'device_sub_type_model' => $e['device_sub_type_model'] ?? null,
-                        'device_sub_type_title' => $e['device_sub_type_title'] ?? null,
-                        'server_name'           => $e['serverName']            ?? null,
-                        'screen_model'          => $e['screenModel']           ?? null,
-                        'projector_ip'          => $e['projector_ip']          ?? null,
-                        'sound_ip'              => $e['sound_ip']              ?? null,
-                        'number'                => $e['number']                ?? null,
-                        'projector_brand'       => $e['projector_brand']       ?? null,
-                        'projector_model'       => $e['projector_model']       ?? null,
-                        'sound_brand'           => $e['sound_brand']           ?? null,
-                        'sound_model'           => $e['sound_model']           ?? null,
-                        'synced_at'             => now(),
-                    ]
-                );
-                $synced++;
+                $loc = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
+                $rows[] = [
+                    'noc_instance_id'       => $noc->id,
+                    'location_id'           => $loc->id,
+                    'id_tms_error'          => $e['id_tms_error'] ?? null,
+                    'title'                 => $e['title']                 ?? null,
+                    'code'                  => $e['code']                  ?? null,
+                    'severity'              => $e['severity']              ?? null,
+                    'message'               => $e['message']               ?? null,
+                    'time_saved'            => $e['time_saved']            ?? null,
+                    'id_screen'             => $e['id_screen']             ?? null,
+                    'ip_projector'          => $e['ip_projector']          ?? null,
+                    'display_message'       => $e['display_message']       ?? null,
+                    'recommended_action'    => $e['recommended_action']    ?? null,
+                    'device_sub_type'       => $e['device_sub_type']       ?? null,
+                    'device_sub_type_ip'    => $e['device_sub_type_ip']    ?? null,
+                    'device_sub_type_model' => $e['device_sub_type_model'] ?? null,
+                    'device_sub_type_title' => $e['device_sub_type_title'] ?? null,
+                    'server_name'           => $e['serverName']            ?? null,
+                    'screen_model'          => $e['screenModel']           ?? null,
+                    'projector_ip'          => $e['projector_ip']          ?? null,
+                    'sound_ip'              => $e['sound_ip']              ?? null,
+                    'number'                => $e['number']                ?? null,
+                    'projector_brand'       => $e['projector_brand']       ?? null,
+                    'projector_model'       => $e['projector_model']       ?? null,
+                    'sound_brand'           => $e['sound_brand']           ?? null,
+                    'sound_model'           => $e['sound_model']           ?? null,
+                    'synced_at'             => now(),
+                ];
+            }
+            if (!empty($rows)) {
+                HubTmsError::upsert($rows, ['noc_instance_id', 'location_id', 'id_tms_error'], [
+                    'title', 'code', 'severity', 'message', 'time_saved', 'id_screen', 'ip_projector',
+                    'display_message', 'recommended_action', 'device_sub_type', 'device_sub_type_ip',
+                    'device_sub_type_model', 'device_sub_type_title', 'server_name', 'screen_model',
+                    'projector_ip', 'sound_ip', 'number', 'projector_brand', 'projector_model', 'sound_brand',
+                    'sound_model', 'synced_at',
+                ]);
+                $synced += count($rows);
             }
         }
 
