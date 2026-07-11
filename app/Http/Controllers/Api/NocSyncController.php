@@ -685,6 +685,7 @@ class NocSyncController extends Controller
                     'severity'           => $e['severity'] ?? null,
                     'message'            => $e['message'] ?? null,
                     'recommended_action' => $e['recommended_action'] ?? null,
+                    'ip_projector'       => $e['ip_projector'] ?? null,
                     'projector_brand'    => $e['projector_brand'] ?? null,
                     'projector_model'    => $e['projector_model'] ?? null,
                     'display_message'    => $e['display_message'] ?? null,
