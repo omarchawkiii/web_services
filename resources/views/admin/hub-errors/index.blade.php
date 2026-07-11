@@ -212,23 +212,13 @@ $tabs = ['summary','server','projector','sound','storage','tms'];
                                 <div class="err-detail-grid">
                                     <div>
                                         <div class="err-detail-section-label">Error Details</div>
-                                        <div class="err-detail-item">Device: <span>{{ $row->screen_model ?? '—' }}</span></div>
-                                        <div class="err-detail-item">Server IP: <span>{{ $row->ip_projector ?? '—' }}</span></div>
+                                        <div class="err-detail-item">Model: <span>{{ $row->screen_model ?? '—' }}</span></div>
+                                        <div class="err-detail-item">Product Name: <span>{{ $row->show_title ?? '—' }}</span></div>
+                                        <div class="err-detail-item">Certificate expiry: <span>{{ $row->certificat_date ?? '—' }}</span></div>
+                                        <div class="err-detail-item">Serial number: <span>{{ $row->serial_number ?? '—' }}</span></div>
+                                        <div class="err-detail-item">IP: <span>{{ $row->ip_projector ?? '—' }}</span></div>
                                         <div class="err-detail-item">Date: <span>{{ $row->date ?? '—' }}</span></div>
                                         <div class="err-detail-item">Screen: <span>{{ $row->server_name ?? '—' }}</span></div>
-                                    </div>
-                                    <div>
-                                        <div class="err-detail-section-label">Projector Info</div>
-                                        <div class="err-detail-item">Brand: <span>{{ $row->projector_brand ?? '—' }}</span></div>
-                                        <div class="err-detail-item">Model: <span>{{ $row->projector_model ?? '—' }}</span></div>
-                                        <div class="err-detail-item">IP: <span>{{ $row->projector_ip ?? '—' }}</span></div>
-                                        <div class="err-detail-item">Sound Brand: <span>{{ $row->sound_brand ?? '—' }}</span></div>
-                                    </div>
-                                    <div>
-                                        <div class="err-detail-section-label">Server Details</div>
-                                        <div class="err-detail-item">Show Title: <span>{{ $row->show_title ?? '—' }}</span></div>
-                                        <div class="err-detail-item">Serial Number: <span>{{ $row->serial_number ?? '—' }}</span></div>
-                                        <div class="err-detail-item">Certificate Date: <span>{{ $row->certificat_date ?? '—' }}</span></div>
                                     </div>
                                     <div>
                                         <div class="err-detail-section-label">Recommended Action</div>
@@ -277,6 +267,7 @@ $tabs = ['summary','server','projector','sound','storage','tms'];
                                     <div>
                                         <div class="err-detail-section-label">Error Details</div>
                                         <div class="err-detail-item">Device: <span>{{ ($row->projector_brand ?? '—') . ' ' . ($row->projector_model ?? '') }}</span></div>
+                                        <div class="err-detail-item">IP: <span>{{ $row->ip_projector ?? '—' }}</span></div>
                                         <div class="err-detail-item">Date: <span>{{ $row->time_saved ?? '—' }}</span></div>
                                         <div class="err-detail-item">Screen: <span>{{ $row->server_name ?? '—' }}</span></div>
                                     </div>
@@ -382,12 +373,6 @@ $tabs = ['summary','server','projector','sound','storage','tms'];
                                         <div class="err-detail-item">Screen: <span>{{ $row->server_name ?? '—' }}</span></div>
                                     </div>
                                     <div>
-                                        <div class="err-detail-section-label">Projector Info</div>
-                                        <div class="err-detail-item">Brand: <span>{{ $row->projector_brand ?? '—' }}</span></div>
-                                        <div class="err-detail-item">Model: <span>{{ $row->projector_model ?? '—' }}</span></div>
-                                        <div class="err-detail-item">Sound Brand: <span>{{ $row->sound_brand ?? '—' }}</span></div>
-                                    </div>
-                                    <div>
                                         <div class="err-detail-section-label">Recommended Action</div>
                                         <div class="err-detail-item"><span style="white-space:pre-wrap;word-break:break-word;">{{ $row->recommended_action ?? '—' }}</span></div>
                                     </div>
@@ -437,12 +422,6 @@ $tabs = ['summary','server','projector','sound','storage','tms'];
                                         <div class="err-detail-item">Device IP: <span>{{ $row->device_sub_type_ip ?? '—' }}</span></div>
                                         <div class="err-detail-item">Time: <span>{{ $row->time_saved ?? '—' }}</span></div>
                                         <div class="err-detail-item">Screen: <span>{{ $row->server_name ?? '—' }}</span></div>
-                                    </div>
-                                    <div>
-                                        <div class="err-detail-section-label">Projector Info</div>
-                                        <div class="err-detail-item">Brand: <span>{{ $row->projector_brand ?? '—' }}</span></div>
-                                        <div class="err-detail-item">Model: <span>{{ $row->projector_model ?? '—' }}</span></div>
-                                        <div class="err-detail-item">IP: <span>{{ $row->projector_ip ?? '—' }}</span></div>
                                     </div>
                                     <div>
                                         <div class="err-detail-section-label">Recommended Action</div>
