@@ -65,9 +65,19 @@ class NocSyncController extends Controller
      * the table. A cache lock serializes concurrent syncs for the same
      * location (hub:push-location-errors vs. the hub:push-data cron) so the
      * delete+insert pair can never interleave and produce duplicates.
+     *
+     * $reportedLocationIds (Hub location ids covered by this sync, from
+     * `summaries`) ensures a location whose count for this error type just
+     * dropped to zero still gets its stale rows deleted — it won't have an
+     * entry in $rowsByLocation otherwise, since the incoming array simply
+     * omits locations with nothing to report.
      */
-    private function replaceRowsByLocation(string $modelClass, int $nocId, array $rowsByLocation): int
+    private function replaceRowsByLocation(string $modelClass, int $nocId, array $rowsByLocation, array $reportedLocationIds = []): int
     {
+        foreach ($reportedLocationIds as $locationId) {
+            $rowsByLocation[$locationId] = $rowsByLocation[$locationId] ?? [];
+        }
+
         $synced = 0;
         foreach ($rowsByLocation as $locationId => $rows) {
             Cache::lock("hub-sync-{$modelClass}-{$locationId}", 15)->block(10, function () use ($modelClass, $nocId, $locationId, $rows) {
@@ -583,6 +593,19 @@ class NocSyncController extends Controller
         $started = now();
         $synced  = 0;
 
+        // ── Locations covered by this sync ──────────────────────────────────
+        // `summaries` always includes every location being reported, even ones
+        // with zero errors of a given type — unlike the per-type arrays below,
+        // which simply omit a location once its count drops to zero. Used to
+        // force cleanup (delete-with-nothing-to-insert) for locations whose
+        // error count for a type just went to zero, so stale rows don't pile
+        // up forever.
+        $reportedLocationIds = [];
+        foreach ($request->input('summaries', []) as $s) {
+            $loc = $this->resolveOrCreateLocation($noc, $s['noc_location_id'], $s['location'] ?? []);
+            $reportedLocationIds[] = $loc->id;
+        }
+
         // ── Summaries ──────────────────────────────────────────────────────
         foreach ($request->input('summaries', []) as $s) {
             $loc = $this->resolveOrCreateLocation($noc, $s['noc_location_id'], $s['location'] ?? []);
@@ -663,7 +686,7 @@ class NocSyncController extends Controller
                     'updated_at'       => now(),
                 ];
             }
-            $synced += $this->replaceRowsByLocation(HubServerError::class, $noc->id, $rowsByLocation);
+            $synced += $this->replaceRowsByLocation(HubServerError::class, $noc->id, $rowsByLocation, $reportedLocationIds);
         }
 
         // ── Projector errors ───────────────────────────────────────────────
@@ -698,7 +721,7 @@ class NocSyncController extends Controller
                     'updated_at'         => now(),
                 ];
             }
-            $synced += $this->replaceRowsByLocation(HubProjectorError::class, $noc->id, $rowsByLocation);
+            $synced += $this->replaceRowsByLocation(HubProjectorError::class, $noc->id, $rowsByLocation, $reportedLocationIds);
         }
 
         // ── Sound errors ───────────────────────────────────────────────────
@@ -731,7 +754,7 @@ class NocSyncController extends Controller
                     'updated_at'            => now(),
                 ];
             }
-            $synced += $this->replaceRowsByLocation(HubSoundError::class, $noc->id, $rowsByLocation);
+            $synced += $this->replaceRowsByLocation(HubSoundError::class, $noc->id, $rowsByLocation, $reportedLocationIds);
         }
 
         // ── Storage errors ─────────────────────────────────────────────────
@@ -763,7 +786,7 @@ class NocSyncController extends Controller
                     'updated_at'              => now(),
                 ];
             }
-            $synced += $this->replaceRowsByLocation(HubStorageError::class, $noc->id, $rowsByLocation);
+            $synced += $this->replaceRowsByLocation(HubStorageError::class, $noc->id, $rowsByLocation, $reportedLocationIds);
         }
 
         // ── TMS errors ─────────────────────────────────────────────────────
@@ -805,7 +828,7 @@ class NocSyncController extends Controller
                     'updated_at'            => now(),
                 ];
             }
-            $synced += $this->replaceRowsByLocation(HubTmsError::class, $noc->id, $rowsByLocation);
+            $synced += $this->replaceRowsByLocation(HubTmsError::class, $noc->id, $rowsByLocation, $reportedLocationIds);
         }
 
         // ── RAID alerts ────────────────────────────────────────────────────
