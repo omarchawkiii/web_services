@@ -27,6 +27,13 @@ class LoginController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            if (!Auth::user()->isSuperAdmin()) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Access to this platform is restricted to Super Admins.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
             return redirect()->intended(route('admin.dashboard'));
         }

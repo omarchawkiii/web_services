@@ -16,8 +16,8 @@ Route::get('/login',   [LoginController::class, 'showLogin'])->name('login');
 Route::post('/login',  [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Admin (requires auth)
-Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+// Admin (requires auth + Super Admin role)
+Route::middleware(['auth', 'super_admin'])->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 

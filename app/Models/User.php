@@ -54,6 +54,7 @@ class User extends Authenticatable
             1       => 'Admin',
             2       => 'Manager',
             3       => 'Cinema Staff',
+            4       => 'Super Admin',
             default => 'Unknown',
         };
     }
@@ -64,6 +65,7 @@ class User extends Authenticatable
             1       => 'bg-blue-100 text-blue-800',
             2       => 'bg-green-100 text-green-800',
             3       => 'bg-gray-100 text-gray-700',
+            4       => 'bg-purple-100 text-purple-800',
             default => 'bg-gray-100 text-gray-700',
         };
     }
@@ -71,6 +73,11 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === 1;
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return (int) $this->role === 4;
     }
 
     public function isLocalAdmin(): bool

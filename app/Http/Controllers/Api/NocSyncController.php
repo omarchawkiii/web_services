@@ -697,14 +697,18 @@ class NocSyncController extends Controller
         }
 
         // ── Sound errors ───────────────────────────────────────────────────
+        // alarm_id is also a per-report event id from the source TMS (same
+        // instability as event_id/code/id_tms_error) — replace per location.
         if ($request->has('sound_errors')) {
-            $rows = [];
+            $rowsByLocation = [];
             foreach ($request->input('sound_errors', []) as $e) {
-                $loc = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
-                $rows[] = [
+                $loc     = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
+                $alarmId = $e['alarm_id'] ?? null;
+                $key     = $alarmId ?? ('__row_' . count($rowsByLocation[$loc->id] ?? []));
+                $rowsByLocation[$loc->id][$key] = [
                     'noc_instance_id'       => $noc->id,
                     'location_id'           => $loc->id,
-                    'alarm_id'              => $e['alarm_id'] ?? null,
+                    'alarm_id'              => $alarmId,
                     'date_saved'            => $e['date_saved'] ?? null,
                     'severity'              => $e['severity'] ?? null,
                     'title'                 => $e['title'] ?? null,
@@ -718,16 +722,11 @@ class NocSyncController extends Controller
                     'sound_ip'              => $e['sound_ip'] ?? null,
                     'display_message'       => $e['display_message'] ?? null,
                     'synced_at'             => now(),
+                    'created_at'            => now(),
+                    'updated_at'            => now(),
                 ];
             }
-            if (!empty($rows)) {
-                HubSoundError::upsert($rows, ['noc_instance_id', 'location_id', 'alarm_id'], [
-                    'date_saved', 'severity', 'title', 'clearable', 'hardware', 'screen', 'message',
-                    'recommended_action', 'device_sub_type_model', 'device_sub_type_title', 'sound_ip',
-                    'display_message', 'synced_at',
-                ]);
-                $synced += count($rows);
-            }
+            $synced += $this->replaceRowsByLocation(HubSoundError::class, $noc->id, $rowsByLocation);
         }
 
         // ── Storage errors ─────────────────────────────────────────────────

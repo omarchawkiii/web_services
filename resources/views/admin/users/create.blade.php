@@ -84,6 +84,7 @@
                         <option value="1" {{ old('role') == '1' ? 'selected' : '' }}>Admin</option>
                         <option value="2" {{ old('role') == '2' ? 'selected' : '' }}>Manager</option>
                         <option value="3" {{ old('role') == '3' ? 'selected' : '' }}>Cinema Staff</option>
+                        <option value="4" {{ old('role') == '4' ? 'selected' : '' }}>Super Admin</option>
                     </select>
                 </div>
 
