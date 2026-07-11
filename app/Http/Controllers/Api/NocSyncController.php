@@ -667,18 +667,22 @@ class NocSyncController extends Controller
         }
 
         // ── Projector errors ───────────────────────────────────────────────
-        // `code` is also a per-report event id from the source TMS, same
-        // instability issue as server errors — replace per location.
+        // `code` is a category code (e.g. "E-4021"), NOT a per-occurrence id —
+        // it can legitimately repeat for two distinct faults on the same
+        // screen. The real per-occurrence id is id_projector_errors — replace
+        // per location keyed on that (falls back to a counter if absent so we
+        // never silently collapse distinct rows).
         if ($request->has('projector_errors')) {
             $rowsByLocation = [];
             foreach ($request->input('projector_errors', []) as $e) {
-                $loc  = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
-                $code = $e['code'] ?? null;
-                $key  = $code !== null ? ($code . '|' . ($e['serverName'] ?? '')) : ('__row_' . count($rowsByLocation[$loc->id] ?? []));
+                $loc      = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
+                $eventId  = $e['id_projector_errors'] ?? null;
+                $key      = $eventId ?? ('__row_' . count($rowsByLocation[$loc->id] ?? []));
                 $rowsByLocation[$loc->id][$key] = [
-                    'noc_instance_id'    => $noc->id,
-                    'location_id'        => $loc->id,
-                    'code'               => $code,
+                    'noc_instance_id'      => $noc->id,
+                    'location_id'          => $loc->id,
+                    'code'                 => $e['code'] ?? null,
+                    'id_projector_errors'  => $eventId,
                     'server_name'        => $e['serverName'] ?? null,
                     'title'              => $e['title'] ?? null,
                     'time_saved'         => $e['time_saved'] ?? null,
@@ -731,14 +735,20 @@ class NocSyncController extends Controller
         }
 
         // ── Storage errors ─────────────────────────────────────────────────
+        // No per-occurrence id exists for storage errors at the source — NOC
+        // itself keys them by (server_name, message). Using server_name alone
+        // silently collapsed two distinct messages on the same server into
+        // one row — key on both instead, and replace per location.
         if ($request->has('storage_errors')) {
-            $rows = [];
+            $rowsByLocation = [];
             foreach ($request->input('storage_errors', []) as $e) {
-                $loc = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
-                $rows[] = [
+                $loc        = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
+                $serverName = $e['serverName'] ?? $e['server_name'] ?? null;
+                $key        = ($serverName ?? '') . '|' . ($e['message'] ?? ('__row_' . count($rowsByLocation[$loc->id] ?? [])));
+                $rowsByLocation[$loc->id][$key] = [
                     'noc_instance_id'         => $noc->id,
                     'location_id'             => $loc->id,
-                    'server_name'             => $e['serverName'] ?? $e['server_name'] ?? null,
+                    'server_name'             => $serverName,
                     'message'                 => $e['message'] ?? null,
                     'recommended_action'      => $e['recommended_action'] ?? null,
                     'storage_generale_status' => $e['storage_generale_status'] ?? $e['severity'] ?? null,
@@ -749,15 +759,11 @@ class NocSyncController extends Controller
                     'screen_model'            => $e['screenModel'] ?? $e['screen_model'] ?? null,
                     'display_message'         => $e['display_message'] ?? null,
                     'synced_at'               => now(),
+                    'created_at'              => now(),
+                    'updated_at'              => now(),
                 ];
             }
-            if (!empty($rows)) {
-                HubStorageError::upsert($rows, ['noc_instance_id', 'location_id', 'server_name'], [
-                    'message', 'recommended_action', 'storage_generale_status', 'projector_brand', 'projector_ip',
-                    'projector_model', 'sound_brand', 'screen_model', 'display_message', 'synced_at',
-                ]);
-                $synced += count($rows);
-            }
+            $synced += $this->replaceRowsByLocation(HubStorageError::class, $noc->id, $rowsByLocation);
         }
 
         // ── TMS errors ─────────────────────────────────────────────────────
