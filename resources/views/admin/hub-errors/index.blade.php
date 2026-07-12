@@ -418,7 +418,9 @@ $tabs = ['summary','server','projector','sound','storage','tms'];
                                 <div class="err-detail-grid">
                                     <div>
                                         <div class="err-detail-section-label">Error Details</div>
-                                        <div class="err-detail-item">Device: <span>{{ $row->device_sub_type ?? '—' }}</span></div>
+                                        @if($row->screen_model)
+                                        <div class="err-detail-item">Model: <span>{{ $row->screen_model }}</span></div>
+                                        @endif
                                         <div class="err-detail-item">Device IP: <span>{{ $row->device_sub_type_ip ?? '—' }}</span></div>
                                         <div class="err-detail-item">Time: <span>{{ $row->time_saved ?? '—' }}</span></div>
                                         <div class="err-detail-item">Screen: <span>{{ $row->server_name ?? '—' }}</span></div>
