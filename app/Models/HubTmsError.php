@@ -33,6 +33,9 @@ class HubTmsError extends Model
         'projector_model',
         'sound_brand',
         'sound_model',
+        'session_start',
+        'spl_title',
+        'movie_title',
         'synced_at',
     ];
 

@@ -617,6 +617,9 @@ Returns the list of TMS (Theatre Management System) errors.
       "sound_ip": "192.168.1.20",
       "sound_brand": "QSC",
       "number": 1,
+      "session_start": "2026-07-13 12:00:00",
+      "spl_title": "MALAM 3 YASINAN",
+      "movie_title": "Malam 3 Yasinan",
       "synced_at": "2026-07-07T08:00:00.000000Z",
       "location": { "id": 3, "name": "BPJ Cinema" },
       "noc_instance": { "id": 1, "name": "NOC Malaysia" }
@@ -624,6 +627,8 @@ Returns the list of TMS (Theatre Management System) errors.
   ]
 }
 ```
+
+`session_start`, `spl_title` and `movie_title` are only populated when `device_sub_type` is `"playback"` — they are `null` for other sub-types (e.g. `server`, `raid`).
 
 ---
 

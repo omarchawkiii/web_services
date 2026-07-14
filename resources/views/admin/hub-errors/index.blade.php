@@ -418,6 +418,17 @@ $tabs = ['summary','server','projector','sound','storage','tms'];
                                 <div class="err-detail-grid">
                                     <div>
                                         <div class="err-detail-section-label">Error Details</div>
+                                        @if($row->device_sub_type === 'playback')
+                                        @if($row->movie_title)
+                                        <div class="err-detail-item">Movie Title: <span>{{ $row->movie_title }}</span></div>
+                                        @endif
+                                        @if($row->spl_title)
+                                        <div class="err-detail-item">SPL Title: <span>{{ $row->spl_title }}</span></div>
+                                        @endif
+                                        @if($row->session_start)
+                                        <div class="err-detail-item">Session Start: <span>{{ $row->session_start }}</span></div>
+                                        @endif
+                                        @endif
                                         @if($row->screen_model)
                                         <div class="err-detail-item">Model: <span>{{ $row->screen_model }}</span></div>
                                         @endif
