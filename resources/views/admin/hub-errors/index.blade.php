@@ -429,7 +429,7 @@ $tabs = ['summary','server','projector','sound','storage','tms'];
                                         <div class="err-detail-item">Session Start: <span>{{ $row->session_start }}</span></div>
                                         @endif
                                         @if($row->time_saved)
-                                        <div class="err-detail-item">Detection Time: <span>{{ $row->time_saved }}</span></div>
+                                        <div class="err-detail-item">Detection Time:: <span>{{ $row->time_saved }}</span></div>
                                         @endif
                                         @if($row->screen_model)
                                         <div class="err-detail-item">Model: <span>{{ $row->screen_model }}</span></div>
