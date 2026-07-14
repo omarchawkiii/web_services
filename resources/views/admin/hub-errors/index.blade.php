@@ -428,13 +428,24 @@ $tabs = ['summary','server','projector','sound','storage','tms'];
                                         @if($row->session_start)
                                         <div class="err-detail-item">Session Start: <span>{{ $row->session_start }}</span></div>
                                         @endif
+                                        @if($row->time_saved)
+                                        <div class="err-detail-item">Detection Time: <span>{{ $row->time_saved }}</span></div>
                                         @endif
+                                        @if($row->screen_model)
+                                        <div class="err-detail-item">Model: <span>{{ $row->screen_model }}</span></div>
+                                        @endif
+                                        @if($row->device_sub_type_ip)
+                                        <div class="err-detail-item">IP: <span>{{ $row->device_sub_type_ip }}</span></div>
+                                        @endif
+                                        <div class="err-detail-item">Screen: <span>{{ $row->server_name ?? '—' }}</span></div>
+                                        @else
                                         @if($row->screen_model)
                                         <div class="err-detail-item">Model: <span>{{ $row->screen_model }}</span></div>
                                         @endif
                                         <div class="err-detail-item">Device IP: <span>{{ $row->device_sub_type_ip ?? '—' }}</span></div>
                                         <div class="err-detail-item">Time: <span>{{ $row->time_saved ?? '—' }}</span></div>
                                         <div class="err-detail-item">Screen: <span>{{ $row->server_name ?? '—' }}</span></div>
+                                        @endif
                                     </div>
                                     <div>
                                         <div class="err-detail-section-label">Recommended Action</div>
