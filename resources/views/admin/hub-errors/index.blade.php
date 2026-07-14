@@ -418,14 +418,14 @@ $tabs = ['summary','server','projector','sound','storage','tms'];
                                 <div class="err-detail-grid">
                                     <div>
                                         <div class="err-detail-section-label">Error Details</div>
-                                        @if($row->device_sub_type === 'playback')
-                                        @if($row->movie_title)
+                                        @if($row->device_sub_type === 'playback' || true )
+                                        @if($row->movie_title || true )
                                         <div class="err-detail-item">Movie Title: <span>{{ $row->movie_title }}</span></div>
                                         @endif
-                                        @if($row->spl_title)
+                                        @if($row->spl_title || true)
                                         <div class="err-detail-item">SPL Title: <span>{{ $row->spl_title }}</span></div>
                                         @endif
-                                        @if($row->session_start)
+                                        @if($row->session_start || true)
                                         <div class="err-detail-item">Session Start: <span>{{ $row->session_start }}</span></div>
                                         @endif
                                         @if($row->time_saved)
