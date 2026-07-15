@@ -317,7 +317,12 @@ $tabs = ['summary','server','projector','sound','storage','tms'];
                                 <div class="err-detail-grid">
                                     <div>
                                         <div class="err-detail-section-label">Error Details</div>
+                                        @if($row->device_sub_type === 'amplifier')
                                         <div class="err-detail-item">Device: <span>{{ $row->device_sub_type_title ?? '—' }}</span></div>
+                                        <div class="err-detail-item">Amplifier: <span>{{ ($row->device_sub_type_model ?? ' ') . ' - ' . ($row->device_sub_type_title ?? ' ') }}</span></div>
+                                        @else
+                                        <div class="err-detail-item">Model: <span>{{ ($row->device_sub_type_model ?? ' ') . ' - ' . ($row->device_sub_type_title ?? ' ') }}</span></div>
+                                        @endif
                                         <div class="err-detail-item">IP: <span>{{ $row->sound_ip ?? '—' }}</span></div>
                                         <div class="err-detail-item">Date: <span>{{ $row->date_saved ?? '—' }}</span></div>
                                         <div class="err-detail-item">Screen: <span>{{ $row->screen ?? '—' }}</span></div>

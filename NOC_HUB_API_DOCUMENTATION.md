@@ -460,6 +460,7 @@ GET /errors/server
       "certificat_date": "2026-12-31",
       "serial_number": "SN-123456",
       "show_title": "The Movie Title",
+      "product_name": "IMS3000",
       "synced_at": "2026-07-07T08:00:00.000000Z",
       "location": { "id": 3, "name": "BPJ Cinema" },
       "noc_instance": { "id": 1, "name": "NOC Malaysia" }
