@@ -125,19 +125,8 @@ class NocSyncController extends Controller
      */
     private function unifiedSubType(array $e): array
     {
-        $subType = $e['device_sub_type'] ?? null;
-
-        if ($subType === 'amplifier') {
-            return [
-                'device_sub_type'       => $subType,
-                'device_sub_type_ip'    => $e['device_sub_type_ip'] ?? null,
-                'device_sub_type_model' => $e['product_name'] ?? null,
-                'device_sub_type_title' => $e['device_sub_type_model'] ?? null,
-            ];
-        }
-
         return [
-            'device_sub_type'       => $subType,
+            'device_sub_type'       => $e['device_sub_type'] ?? null,
             'device_sub_type_ip'    => $e['device_sub_type_ip'] ?? null,
             'device_sub_type_model' => $e['device_sub_type_model'] ?? null,
             'device_sub_type_title' => $e['device_sub_type_title'] ?? null,
@@ -847,8 +836,8 @@ class NocSyncController extends Controller
                     'display_message'    => $e['display_message'] ?? null,
                     'recommended_action' => $e['recommended_action'] ?? null,
                     'severity'           => $e['severity'] ?? null,
-                    'brand'              => $e['sound_brand'] ?? null,
-                    'model'              => $e['sound_model'] ?? null,
+                    'brand'              => $e['brand'] ?? null,
+                    'model'              => $e['model'] ?? null,
                     'serial_number'      => $e['sound_serial_number'] ?? null,
                     'date_error'         => $e['date_saved'] ?? null,
                     'synced_at'          => now(),

@@ -189,7 +189,7 @@
                                     <div>
                                         <div class="err-detail-section-label">Error Details</div>
                                         @if($row->brand || $row->model)
-                                        <div class="err-detail-item">Brand / Model: <span>{{ $row->brand ?? '—' }} {{ $row->model ?? '' }}</span></div>
+                                        <div class="err-detail-item">Brand / Model: <span>{{ $row->brand ?? '—' }} /  {{ $row->model ?? '' }}</span></div>
                                         @endif
                                         @if($row->serial_number)
                                         <div class="err-detail-item">Serial Number: <span>{{ $row->serial_number }}</span></div>
@@ -206,7 +206,7 @@
                                         <div class="err-detail-section-label">Device Sub-Type ({{ $row->device_sub_type }})</div>
                                         <div class="err-detail-item">IP: <span>{{ $row->device_sub_type_ip ?? '—' }}</span></div>
                                         <div class="err-detail-item">Model: <span>{{ $row->device_sub_type_model ?? '—' }}</span></div>
-                                        <div class="err-detail-item">Title: <span>{{ $row->device_sub_type_title ?? '—' }}</span></div>
+                                        <div class="err-detail-item">Brand: <span>{{ $row->device_sub_type_title ?? '—' }}</span></div>
                                     </div>
                                     @endif
                                     @if($row->movie_title || $row->spl_title || $row->session_start)
