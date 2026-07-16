@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HubErrorAdminController;
+use App\Http\Controllers\Admin\HubUnifiedErrorAdminController;
 use App\Http\Controllers\Admin\HubPlaybackController;
 use App\Http\Controllers\Admin\HubScheduleAdminController;
 use App\Http\Controllers\Admin\LocationController;
@@ -26,6 +27,7 @@ Route::middleware(['auth', 'super_admin'])->prefix('admin')->name('admin.')->gro
     Route::get('/playback/{id}/detail', [HubPlaybackController::class, 'detail'])->name('hub-playback.detail');
     Route::get('/schedules', [HubScheduleAdminController::class, 'index'])->name('hub-schedules.index');
     Route::get('/errors',    [HubErrorAdminController::class,    'index'])->name('hub-errors.index');
+    Route::get('/all-errors', [HubUnifiedErrorAdminController::class, 'index'])->name('hub-unified-errors.index');
     Route::get('/sync-logs', [SyncLogController::class,          'index'])->name('sync-logs.index');
 
     // ── Locations ─────────────────────────────────────────────────────────────

@@ -386,6 +386,7 @@
     <a href="#errors-raid"     class="nav-link"><span class="nav-method m-get">GET</span> RAID Alerts</a>
     <a href="#errors-alarms"   class="nav-link"><span class="nav-method m-get">GET</span> Server Alarms</a>
     <a href="#errors-tms"      class="nav-link"><span class="nav-method m-get">GET</span> TMS Errors</a>
+    <a href="#errors-all"      class="nav-link"><span class="nav-method m-get">GET</span> All Errors (Unified)</a>
 </div>
 
 <div class="nav-group">
@@ -1443,6 +1444,8 @@
     <span class="json-key">"message"</span>: <span class="json-str">"Disk read error on sector 0x4A2F"</span>,
     <span class="json-key">"recommended_action"</span>: <span class="json-str">"Replace the failing disk immediately"</span>,
     <span class="json-key">"product_name"</span>: <span class="json-str">"IMS3000"</span>,
+    <span class="json-key">"server_brand"</span>: <span class="json-str">"Dolby"</span>,
+    <span class="json-key">"server_model"</span>: <span class="json-str">"IMS3000"</span>,
     <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
     <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
     }
@@ -1674,6 +1677,64 @@
     <span class="json-key">"spl_title"</span>: <span class="json-str">"MALAM 3 YASINAN"</span>,
     <span class="json-key">"movie_title"</span>: <span class="json-str">"Malam 3 Yasinan"</span>,
     <span class="json-key">"synced_at"</span>: <span class="json-str">"2026-06-26T10:35:00.000000Z"</span>,
+    <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
+    <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
+    }
+]
+}</pre>
+        </div>
+        <div class="response-tabs">
+        <span class="resp-tab resp-200">200 OK</span>
+        <span class="resp-tab resp-401">401 — Unauthenticated</span>
+        </div>
+    </div>
+    </div>
+
+    <!-- ALL ERRORS (UNIFIED) -->
+    <div class="endpoint" id="errors-all">
+    <div class="endpoint-header">
+        <span class="badge badge-get">GET</span>
+        <span class="endpoint-path">/api/hub/mobile/errors/all</span>
+        <span class="auth-badge">Auth Required</span>
+    </div>
+    <div class="endpoint-body">
+        <p class="endpoint-desc-text">
+        Unified error feed combining Server, Projector, Sound, Storage and TMS errors in a single normalized list, across all locations accessible by the authenticated user. Fields like <code>brand</code>/<code>model</code>/<code>serial_number</code>/<code>device_ip</code> are normalized per <code>device_type</code> (e.g. for <code>device_type=sound</code>, <code>brand</code> comes from the sound amplifier's brand). This is an additive endpoint — the original per-type endpoints above (<code>/errors/server</code>, <code>/errors/projector</code>, etc.) still work unchanged.
+        </p>
+        <div class="table-label">Query Parameters</div>
+        <table>
+            <thead><tr><th>Field</th><th>Type</th><th></th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td class="field-name">device_type</td><td class="field-type">string</td><td><span class="tag tag-opt">optional</span></td><td>Filter by <code>server</code>, <code>projector</code>, <code>sound</code>, <code>storage</code>, or <code>tms</code></td></tr>
+            </tbody>
+        </table>
+        <div class="code-block">
+        <div class="code-block-header"><span>Response Example</span><span>200 OK</span></div>
+        <pre>{
+<span class="json-key">"errors_list"</span>: [
+    {
+    <span class="json-key">"id"</span>: <span class="json-num">1</span>,
+    <span class="json-key">"device_type"</span>: <span class="json-str">"sound"</span>,
+    <span class="json-key">"external_key"</span>: <span class="json-str">"2235250"</span>,
+    <span class="json-key">"message"</span>: <span class="json-str">"load fault (short)"</span>,
+    <span class="json-key">"screen_name"</span>: <span class="json-str">"Screen-07"</span>,
+    <span class="json-key">"screen_number"</span>: <span class="json-str">null</span>,
+    <span class="json-key">"device_ip"</span>: <span class="json-str">"172.17.46.74"</span>,
+    <span class="json-key">"display_message"</span>: <span class="json-str">"Speaker output short circuit detected"</span>,
+    <span class="json-key">"recommended_action"</span>: <span class="json-str">"Inspect speaker wiring on affected channel"</span>,
+    <span class="json-key">"severity"</span>: <span class="json-str">"critical"</span>,
+    <span class="json-key">"brand"</span>: <span class="json-str">"Dolby"</span>,
+    <span class="json-key">"model"</span>: <span class="json-str">"IMS3000"</span>,
+    <span class="json-key">"serial_number"</span>: <span class="json-str">"368042"</span>,
+    <span class="json-key">"date_error"</span>: <span class="json-str">"2026-07-15 12:28:57"</span>,
+    <span class="json-key">"device_sub_type"</span>: <span class="json-str">"amplifier"</span>,
+    <span class="json-key">"device_sub_type_ip"</span>: <span class="json-str">"172.17.46.79"</span>,
+    <span class="json-key">"device_sub_type_model"</span>: <span class="json-str">"IMS3000"</span>,
+    <span class="json-key">"device_sub_type_title"</span>: <span class="json-str">"DMA16302"</span>,
+    <span class="json-key">"movie_title"</span>: <span class="json-str">null</span>,
+    <span class="json-key">"spl_title"</span>: <span class="json-str">null</span>,
+    <span class="json-key">"session_start"</span>: <span class="json-str">null</span>,
+    <span class="json-key">"synced_at"</span>: <span class="json-str">"2026-07-15T12:30:00.000000Z"</span>,
     <span class="json-key">"location"</span>: { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"name"</span>: <span class="json-str">"Grand Cinema Paris"</span> },
     <span class="json-key">"noc_instance"</span>: { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"name"</span>: <span class="json-str">"NOC France"</span> }
     }

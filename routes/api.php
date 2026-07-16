@@ -75,6 +75,7 @@ Route::prefix('hub/mobile')->name('hub.mobile.')->group(function () {
             Route::get('/storage',       [HubErrorController::class, 'storage'])->name('storage');
 
             Route::get('/tms',           [HubErrorController::class, 'tms'])->name('tms');
+            Route::get('/all',           [HubErrorController::class, 'all'])->name('all');
         });
     });
 });

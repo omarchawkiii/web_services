@@ -461,6 +461,8 @@ GET /errors/server
       "serial_number": "SN-123456",
       "show_title": "The Movie Title",
       "product_name": "IMS3000",
+      "server_brand": "Dolby",
+      "server_model": "IMS3000",
       "synced_at": "2026-07-07T08:00:00.000000Z",
       "location": { "id": 3, "name": "BPJ Cinema" },
       "noc_instance": { "id": 1, "name": "NOC Malaysia" }
@@ -630,6 +632,69 @@ Returns the list of TMS (Theatre Management System) errors.
 ```
 
 `session_start`, `spl_title` and `movie_title` are only populated when `device_sub_type` is `"playback"` — they are `null` for other sub-types (e.g. `server`, `raid`).
+
+---
+
+### 19. All Errors (Unified)
+
+```
+GET /errors/all
+```
+
+Returns a single normalized list combining Server, Projector, Sound, Storage and TMS errors. This is **additive** — endpoints 14-18 above are unchanged and continue to work independently; this endpoint reads from a separate table (`hub_unified_errors`) that is populated alongside the existing per-type tables on every sync.
+
+**Query parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|--------------|
+| `device_type` | string | optional | Filter by `server`, `projector`, `sound`, `storage`, or `tms` |
+
+`brand`, `model`, `serial_number` and `device_ip` are normalized per `device_type`:
+
+| device_type | brand | model | device_ip | serial_number |
+|---|---|---|---|---|
+| server | `server_brand` | `server_model` | `ip_projector` | `server_serial_number` |
+| projector | `projector_brand` | `projector_model` | `projector_ip` | `projector_serial_number` |
+| sound | `sound_brand` | `sound_model` | `sound_ip` | `sound_serial_number` |
+| storage | — | `screen_model` | `projector_ip` | — |
+| tms | — | — | `ip_projector` | — |
+
+For `device_sub_type = "amplifier"` (Sound/TMS), `device_sub_type_model` is sourced from `product_name` and `device_sub_type_title` from the raw `device_sub_type_model`, matching the amplifier-specific mapping used elsewhere. `movie_title`/`spl_title`/`session_start` are only populated for TMS errors where `device_sub_type = "playback"`.
+
+**Success response — 200 OK:**
+
+```json
+{
+  "errors_list": [
+    {
+      "id": 1,
+      "device_type": "sound",
+      "external_key": "2235250",
+      "message": "load fault (short)",
+      "screen_name": "Screen-07",
+      "screen_number": null,
+      "device_ip": "172.17.46.74",
+      "display_message": "Speaker output short circuit detected",
+      "recommended_action": "Inspect speaker wiring on affected channel",
+      "severity": "critical",
+      "brand": "Dolby",
+      "model": "IMS3000",
+      "serial_number": "368042",
+      "date_error": "2026-07-15 12:28:57",
+      "device_sub_type": "amplifier",
+      "device_sub_type_ip": "172.17.46.79",
+      "device_sub_type_model": "IMS3000",
+      "device_sub_type_title": "DMA16302",
+      "movie_title": null,
+      "spl_title": null,
+      "session_start": null,
+      "synced_at": "2026-07-15T12:30:00.000000Z",
+      "location": { "id": 1, "name": "Grand Cinema Paris" },
+      "noc_instance": { "id": 2, "name": "NOC France" }
+    }
+  ]
+}
+```
 
 ---
 

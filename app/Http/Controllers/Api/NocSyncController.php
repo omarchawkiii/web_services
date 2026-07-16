@@ -21,6 +21,7 @@ use App\Models\HubSoundError;
 use App\Models\HubStorageDevice;
 use App\Models\HubStorageError;
 use App\Models\HubTmsError;
+use App\Models\HubUnifiedError;
 use App\Models\HubSyncLog;
 use App\Models\Location;
 use App\Models\NocInstance;
@@ -89,6 +90,58 @@ class NocSyncController extends Controller
             $synced += count($rows);
         }
         return $synced;
+    }
+
+    /**
+     * Same replace-per-location strategy as replaceRowsByLocation(), but
+     * additionally scoped by device_type — the unified table holds every
+     * error type in one place, so the delete must not touch other types'
+     * rows for the same location.
+     */
+    private function replaceUnifiedRowsByLocation(int $nocId, string $deviceType, array $rowsByLocation, array $reportedLocationIds = []): int
+    {
+        foreach ($reportedLocationIds as $locationId) {
+            $rowsByLocation[$locationId] = $rowsByLocation[$locationId] ?? [];
+        }
+
+        $synced = 0;
+        foreach ($rowsByLocation as $locationId => $rows) {
+            Cache::lock("hub-sync-unified-{$deviceType}-{$locationId}", 15)->block(10, function () use ($nocId, $deviceType, $locationId, $rows) {
+                DB::transaction(function () use ($nocId, $deviceType, $locationId, $rows) {
+                    HubUnifiedError::where('noc_instance_id', $nocId)->where('location_id', $locationId)->where('device_type', $deviceType)->delete();
+                    HubUnifiedError::insert($rows);
+                });
+            });
+            $synced += count($rows);
+        }
+        return $synced;
+    }
+
+    /**
+     * Resolves device_sub_type_ip/model/title for the unified table. The
+     * "amplifier" sub-type reuses product_name/device_sub_type_model as the
+     * model/title source instead of the normal fields (see Sound errors'
+     * own amplifier handling in NocSyncController and NOC's Error_listController).
+     */
+    private function unifiedSubType(array $e): array
+    {
+        $subType = $e['device_sub_type'] ?? null;
+
+        if ($subType === 'amplifier') {
+            return [
+                'device_sub_type'       => $subType,
+                'device_sub_type_ip'    => $e['device_sub_type_ip'] ?? null,
+                'device_sub_type_model' => $e['product_name'] ?? null,
+                'device_sub_type_title' => $e['device_sub_type_model'] ?? null,
+            ];
+        }
+
+        return [
+            'device_sub_type'       => $subType,
+            'device_sub_type_ip'    => $e['device_sub_type_ip'] ?? null,
+            'device_sub_type_model' => $e['device_sub_type_model'] ?? null,
+            'device_sub_type_title' => $e['device_sub_type_title'] ?? null,
+        ];
     }
 
     private function resolveOrCreateScreen(NocInstance $noc, Location $location, int $nocScreenId, array $screenData = []): HubScreen
@@ -654,10 +707,31 @@ class NocSyncController extends Controller
         // batch per location instead (see replaceRowsByLocation()).
         if ($request->has('server_errors')) {
             $rowsByLocation = [];
+            $unifiedRowsByLocation = [];
             foreach ($request->input('server_errors', []) as $e) {
                 $loc     = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
                 $eventId = $e['id_server_error'] ?? $e['eventId'] ?? null;
                 $key     = $eventId ?? ('__row_' . count($rowsByLocation[$loc->id] ?? []));
+                $unifiedRowsByLocation[$loc->id][$key] = [
+                    'noc_instance_id'    => $noc->id,
+                    'location_id'        => $loc->id,
+                    'device_type'        => 'server',
+                    'external_key'       => $eventId,
+                    'message'            => $e['message'] ?? null,
+                    'screen_name'        => $e['serverName'] ?? null,
+                    'screen_number'      => $e['number'] ?? null,
+                    'device_ip'          => $e['ip_projector'] ?? null,
+                    'display_message'    => $e['display_message'] ?? null,
+                    'recommended_action' => $e['recommended_action'] ?? null,
+                    'severity'           => $e['criticity'] ?? null,
+                    'brand'              => $e['server_brand'] ?? null,
+                    'model'              => $e['server_model'] ?? null,
+                    'serial_number'      => $e['server_serial_number'] ?? null,
+                    'date_error'         => $e['date'] ?? null,
+                    'synced_at'          => now(),
+                    'created_at'         => now(),
+                    'updated_at'         => now(),
+                ];
                 $rowsByLocation[$loc->id][$key] = [
                     'noc_instance_id'  => $noc->id,
                     'location_id'      => $loc->id,
@@ -682,12 +756,15 @@ class NocSyncController extends Controller
                     'serial_number'    => $e['serialNumber'] ?? $e['serial_number'] ?? null,
                     'show_title'       => $e['showTitle'] ?? $e['show_title'] ?? null,
                     'product_name'     => $e['product_name'] ?? null,
+                    'server_brand'     => $e['server_brand'] ?? null,
+                    'server_model'     => $e['server_model'] ?? null,
                     'synced_at'        => now(),
                     'created_at'       => now(),
                     'updated_at'       => now(),
                 ];
             }
             $synced += $this->replaceRowsByLocation(HubServerError::class, $noc->id, $rowsByLocation, $reportedLocationIds);
+            $this->replaceUnifiedRowsByLocation($noc->id, 'server', $unifiedRowsByLocation, $reportedLocationIds);
         }
 
         // ── Projector errors ───────────────────────────────────────────────
@@ -698,10 +775,31 @@ class NocSyncController extends Controller
         // never silently collapse distinct rows).
         if ($request->has('projector_errors')) {
             $rowsByLocation = [];
+            $unifiedRowsByLocation = [];
             foreach ($request->input('projector_errors', []) as $e) {
                 $loc      = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
                 $eventId  = $e['id_projector_errors'] ?? null;
                 $key      = $eventId ?? ('__row_' . count($rowsByLocation[$loc->id] ?? []));
+                $unifiedRowsByLocation[$loc->id][$key] = [
+                    'noc_instance_id'    => $noc->id,
+                    'location_id'        => $loc->id,
+                    'device_type'        => 'projector',
+                    'external_key'       => $eventId,
+                    'message'            => $e['message'] ?? null,
+                    'screen_name'        => $e['serverName'] ?? null,
+                    'screen_number'      => $e['number'] ?? null,
+                    'device_ip'          => $e['ip_projector'] ?? null,
+                    'display_message'    => $e['display_message'] ?? null,
+                    'recommended_action' => $e['recommended_action'] ?? null,
+                    'severity'           => $e['severity'] ?? null,
+                    'brand'              => $e['projector_brand'] ?? null,
+                    'model'              => $e['projector_model'] ?? null,
+                    'serial_number'      => $e['projector_serial_number'] ?? null,
+                    'date_error'         => $e['time_saved'] ?? null,
+                    'synced_at'          => now(),
+                    'created_at'         => now(),
+                    'updated_at'         => now(),
+                ];
                 $rowsByLocation[$loc->id][$key] = [
                     'noc_instance_id'      => $noc->id,
                     'location_id'          => $loc->id,
@@ -723,6 +821,7 @@ class NocSyncController extends Controller
                 ];
             }
             $synced += $this->replaceRowsByLocation(HubProjectorError::class, $noc->id, $rowsByLocation, $reportedLocationIds);
+            $this->replaceUnifiedRowsByLocation($noc->id, 'projector', $unifiedRowsByLocation, $reportedLocationIds);
         }
 
         // ── Sound errors ───────────────────────────────────────────────────
@@ -730,10 +829,32 @@ class NocSyncController extends Controller
         // instability as event_id/code/id_tms_error) — replace per location.
         if ($request->has('sound_errors')) {
             $rowsByLocation = [];
+            $unifiedRowsByLocation = [];
             foreach ($request->input('sound_errors', []) as $e) {
                 $loc     = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
                 $alarmId = $e['alarm_id'] ?? null;
                 $key     = $alarmId ?? ('__row_' . count($rowsByLocation[$loc->id] ?? []));
+                $subType = $this->unifiedSubType($e);
+                $unifiedRowsByLocation[$loc->id][$key] = array_merge($subType, [
+                    'noc_instance_id'    => $noc->id,
+                    'location_id'        => $loc->id,
+                    'device_type'        => 'sound',
+                    'external_key'       => $alarmId,
+                    'message'            => $e['message'] ?? null,
+                    'screen_name'        => $e['screen'] ?? null,
+                    'screen_number'      => null,
+                    'device_ip'          => $e['sound_ip'] ?? null,
+                    'display_message'    => $e['display_message'] ?? null,
+                    'recommended_action' => $e['recommended_action'] ?? null,
+                    'severity'           => $e['severity'] ?? null,
+                    'brand'              => $e['sound_brand'] ?? null,
+                    'model'              => $e['sound_model'] ?? null,
+                    'serial_number'      => $e['sound_serial_number'] ?? null,
+                    'date_error'         => $e['date_saved'] ?? null,
+                    'synced_at'          => now(),
+                    'created_at'         => now(),
+                    'updated_at'         => now(),
+                ]);
                 $rowsByLocation[$loc->id][$key] = [
                     'noc_instance_id'       => $noc->id,
                     'location_id'           => $loc->id,
@@ -757,6 +878,7 @@ class NocSyncController extends Controller
                 ];
             }
             $synced += $this->replaceRowsByLocation(HubSoundError::class, $noc->id, $rowsByLocation, $reportedLocationIds);
+            $this->replaceUnifiedRowsByLocation($noc->id, 'sound', $unifiedRowsByLocation, $reportedLocationIds);
         }
 
         // ── Storage errors ─────────────────────────────────────────────────
@@ -766,10 +888,31 @@ class NocSyncController extends Controller
         // one row — key on both instead, and replace per location.
         if ($request->has('storage_errors')) {
             $rowsByLocation = [];
+            $unifiedRowsByLocation = [];
             foreach ($request->input('storage_errors', []) as $e) {
                 $loc        = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
                 $serverName = $e['serverName'] ?? $e['server_name'] ?? null;
                 $key        = ($serverName ?? '') . '|' . ($e['message'] ?? ('__row_' . count($rowsByLocation[$loc->id] ?? [])));
+                $unifiedRowsByLocation[$loc->id][$key] = [
+                    'noc_instance_id'    => $noc->id,
+                    'location_id'        => $loc->id,
+                    'device_type'        => 'storage',
+                    'external_key'       => $key,
+                    'message'            => $e['message'] ?? null,
+                    'screen_name'        => $serverName,
+                    'screen_number'      => null,
+                    'device_ip'          => $e['projector_ip'] ?? null,
+                    'display_message'    => $e['display_message'] ?? null,
+                    'recommended_action' => $e['recommended_action'] ?? null,
+                    'severity'           => $e['storage_generale_status'] ?? $e['severity'] ?? null,
+                    'brand'              => null,
+                    'model'              => $e['screenModel'] ?? $e['screen_model'] ?? null,
+                    'serial_number'      => null,
+                    'date_error'         => null,
+                    'synced_at'          => now(),
+                    'created_at'         => now(),
+                    'updated_at'         => now(),
+                ];
                 $rowsByLocation[$loc->id][$key] = [
                     'noc_instance_id'         => $noc->id,
                     'location_id'             => $loc->id,
@@ -789,16 +932,43 @@ class NocSyncController extends Controller
                 ];
             }
             $synced += $this->replaceRowsByLocation(HubStorageError::class, $noc->id, $rowsByLocation, $reportedLocationIds);
+            $this->replaceUnifiedRowsByLocation($noc->id, 'storage', $unifiedRowsByLocation, $reportedLocationIds);
         }
 
         // ── TMS errors ─────────────────────────────────────────────────────
         // id_tms_error is likewise a per-report event id — replace per location.
         if ($request->has('tms_errors')) {
             $rowsByLocation = [];
+            $unifiedRowsByLocation = [];
             foreach ($request->input('tms_errors', []) as $e) {
                 $loc        = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
                 $idTmsError = $e['id_tms_error'] ?? null;
                 $key        = $idTmsError ?? ('__row_' . count($rowsByLocation[$loc->id] ?? []));
+                $subType    = $this->unifiedSubType($e);
+                $isPlayback = ($e['device_sub_type'] ?? null) === 'playback';
+                $unifiedRowsByLocation[$loc->id][$key] = array_merge($subType, [
+                    'noc_instance_id'    => $noc->id,
+                    'location_id'        => $loc->id,
+                    'device_type'        => 'tms',
+                    'external_key'       => $idTmsError,
+                    'message'            => $e['message'] ?? null,
+                    'screen_name'        => $e['serverName'] ?? null,
+                    'screen_number'      => $e['number'] ?? null,
+                    'device_ip'          => $e['ip_projector'] ?? null,
+                    'display_message'    => $e['display_message'] ?? null,
+                    'recommended_action' => $e['recommended_action'] ?? null,
+                    'severity'           => $e['severity'] ?? null,
+                    'brand'              => null,
+                    'model'              => null,
+                    'serial_number'      => null,
+                    'date_error'         => $e['time_saved'] ?? null,
+                    'movie_title'        => $isPlayback ? ($e['movie_title'] ?? null) : null,
+                    'spl_title'          => $isPlayback ? ($e['spl_title'] ?? null) : null,
+                    'session_start'      => $isPlayback ? ($e['session_start'] ?? null) : null,
+                    'synced_at'          => now(),
+                    'created_at'         => now(),
+                    'updated_at'         => now(),
+                ]);
                 $rowsByLocation[$loc->id][$key] = [
                     'noc_instance_id'       => $noc->id,
                     'location_id'           => $loc->id,
@@ -834,6 +1004,7 @@ class NocSyncController extends Controller
                 ];
             }
             $synced += $this->replaceRowsByLocation(HubTmsError::class, $noc->id, $rowsByLocation, $reportedLocationIds);
+            $this->replaceUnifiedRowsByLocation($noc->id, 'tms', $unifiedRowsByLocation, $reportedLocationIds);
         }
 
         // ── RAID alerts ────────────────────────────────────────────────────

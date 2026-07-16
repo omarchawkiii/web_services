@@ -11,6 +11,7 @@ use App\Models\HubServerError;
 use App\Models\HubSoundError;
 use App\Models\HubStorageError;
 use App\Models\HubTmsError;
+use App\Models\HubUnifiedError;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -86,5 +87,16 @@ class HubErrorController extends Controller
     {
         $list = HubTmsError::with(['location','nocInstance'])->whereIn('location_id', $this->userLocationIds($request))->get();
         return response()->json(['tms_errors_list' => $list]);
+    }
+
+    public function all(Request $request): JsonResponse
+    {
+        $query = HubUnifiedError::with(['location','nocInstance'])->whereIn('location_id', $this->userLocationIds($request));
+
+        if ($request->filled('device_type')) {
+            $query->where('device_type', $request->input('device_type'));
+        }
+
+        return response()->json(['errors_list' => $query->get()]);
     }
 }
