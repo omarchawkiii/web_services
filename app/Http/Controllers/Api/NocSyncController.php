@@ -821,9 +821,13 @@ class NocSyncController extends Controller
             $unifiedRowsByLocation = [];
             foreach ($request->input('sound_errors', []) as $e) {
                 $loc     = $this->resolveOrCreateLocation($noc, $e['noc_location_id'], $e['location'] ?? []);
-                $alarmId = $e['alarm_id'] ?? null;
-                $key     = $alarmId ?? ('__row_' . count($rowsByLocation[$loc->id] ?? []));
-                $subType = $this->unifiedSubType($e);
+                $alarmId     = $e['alarm_id'] ?? null;
+                $key         = $alarmId ?? ('__row_' . count($rowsByLocation[$loc->id] ?? []));
+                $subType     = $this->unifiedSubType($e);
+                $isAmplifier = strtolower($e['device_sub_type'] ?? '') === 'amplifier';
+                // For amplifiers, brand/model come from device_sub_type_model/title
+                // instead of the generic Brand/Model fields — mirrors the same swap
+                // applied in NOC's Error_listController::set_error_list_api (case 'sound').
                 $unifiedRowsByLocation[$loc->id][$key] = array_merge($subType, [
                     'noc_instance_id'    => $noc->id,
                     'location_id'        => $loc->id,
@@ -836,8 +840,8 @@ class NocSyncController extends Controller
                     'display_message'    => $e['display_message'] ?? null,
                     'recommended_action' => $e['recommended_action'] ?? null,
                     'severity'           => $e['severity'] ?? null,
-                    'brand'              => $e['brand'] ?? null,
-                    'model'              => $e['model'] ?? null,
+                    'brand'              => $isAmplifier ? ($e['device_sub_type_model'] ?? null) : ($e['brand'] ?? null),
+                    'model'              => $isAmplifier ? ($e['device_sub_type_title'] ?? null) : ($e['model'] ?? null),
                     'serial_number'      => $e['sound_serial_number'] ?? null,
                     'date_error'         => $e['date_saved'] ?? null,
                     'synced_at'          => now(),
